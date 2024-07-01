@@ -1,1 +1,22 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 rootProject.name = 'messenger'
+include 'messegerclient', 'messengerserver'
+
+[
+        'messenger-client',
+        'messenger-server'
+
+].forEach {
+    include it
+}
