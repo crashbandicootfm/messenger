@@ -1,16 +1,11 @@
 dependencies {
 
-    implementation project(':messenger-server')
+    implementation project(':messenger-server:messenger-server-api')
 
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    compileOnly 'org.jetbrains:annotations:24.0.0'
-    compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.30'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 }

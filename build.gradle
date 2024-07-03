@@ -17,9 +17,17 @@ subprojects {
     targetCompatibility = javaVersion
 
     dependencies {
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+
+        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
         implementation 'org.springframework.boot:spring-boot-starter'
+        implementation "org.jetbrains:annotations:$jetbrainsAnnotationsVersion"
+
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
     }
 
     tasks.named('test') {

@@ -15,7 +15,8 @@ include 'messegerclient', 'messengerserver'
 
 [
         'messenger-client',
-        'messenger-server'
+        'messenger-server:messenger-server',
+        'messenger-server:messenger-server-api',
 
 ].forEach {
     include it
