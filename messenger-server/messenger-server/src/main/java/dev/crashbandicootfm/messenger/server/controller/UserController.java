@@ -1,19 +1,22 @@
-package dev.crashbandicootfm.messenger.server.controller.v1;
+package dev.crashbandicootfm.messenger.server.controller;
 
 import com.github.dozermapper.core.Mapper;
+import dev.crashbandicootfm.messenger.server.api.dto.request.UserRequest;
+import dev.crashbandicootfm.messenger.server.api.dto.response.UserResponse;
 import dev.crashbandicootfm.messenger.server.entity.User;
 import dev.crashbandicootfm.messenger.server.service.user.UserService;
-import dev.crashbandicootfm.messenger.server.api.dto.UserDto;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1/users")
+@Slf4j
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserController {
@@ -23,10 +26,12 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
-    public UserDto registerUser(@RequestBody UserDto userDto) {
-            User user = mapper.map(userDto, User.class);
-            User registeredUser = userService.registerUser(user);
-            return mapper.map(registeredUser, UserDto.class);
+    public UserResponse registerUser(@NotNull @RequestBody UserRequest userRequest) {
+        User user = mapper.map(userRequest, User.class);
+        log.info("User: {}", user);
+        User registeredUser = userService.registerUser(user);
+        log.info("Registered user: {}", registeredUser);
+        return mapper.map(registeredUser, UserResponse.class);
     }
 
     @PostMapping("/login")

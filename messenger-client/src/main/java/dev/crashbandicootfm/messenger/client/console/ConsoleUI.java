@@ -1,7 +1,7 @@
 package dev.crashbandicootfm.messenger.client.console;
 
 import dev.crashbandicootfm.messenger.client.service.UserService;
-import dev.crashbandicootfm.messenger.server.api.dto.UserDto;
+import dev.crashbandicootfm.messenger.server.api.dto.request.UserRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -53,8 +53,8 @@ public class ConsoleUI implements UserInterface {
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
 
-        UserDto userDto = new UserDto(username, password);
-        userService.registerUser(userDto);
+        UserRequest user = new UserRequest(username, password);
+        userService.registerUser(user);
         System.out.println("User registered successfully");
     }
 

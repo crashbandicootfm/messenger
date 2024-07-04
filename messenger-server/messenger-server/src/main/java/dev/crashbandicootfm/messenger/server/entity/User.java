@@ -16,17 +16,15 @@ import org.jetbrains.annotations.NotNull;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class User {
 
-    @NonNull
-    @Column(nullable = false, length = 20)
-    @NotNull String name;
+    @Column
+    String username;
 
-    @NonNull
-    @Column(nullable = false, length = 30)
-    @NotNull String password;
+    @Column
+    String password;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     @NonFinal
-    int ident;
+    long id;
 }
