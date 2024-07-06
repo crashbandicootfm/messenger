@@ -1,6 +1,7 @@
 package dev.crashbandicootfm.messenger.server.service.user;
 
 import dev.crashbandicootfm.messenger.server.entity.User;
+import dev.crashbandicootfm.messenger.server.exception.user.UserException;
 import dev.crashbandicootfm.messenger.server.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +17,7 @@ public class UserServiceImpl implements UserService {
     @NotNull UserRepository userRepository;
 
     @Override
-    public User registerUser(@NotNull User user) {
+    public User registerUser(@NotNull User user) throws UserException {
         return userRepository.save(user);
     }
 

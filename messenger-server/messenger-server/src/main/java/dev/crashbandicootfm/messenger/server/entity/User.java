@@ -13,14 +13,16 @@ import org.jetbrains.annotations.NotNull;
 @Table(name = "app_user")
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
 
-    @Column
-    String username;
+    @NonNull
+    @Column(updatable = false, nullable = false, unique = true)
+    @NotNull String username;
 
-    @Column
-    String password;
+    @NonNull
+    @Column(nullable = false)
+    @NotNull String password;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

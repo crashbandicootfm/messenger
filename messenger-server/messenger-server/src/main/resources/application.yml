@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:database
+    url: jdbc:h2:file:~/database-cache
     username: dev
     password: dev
     driver-class-name: org.h2.Driver

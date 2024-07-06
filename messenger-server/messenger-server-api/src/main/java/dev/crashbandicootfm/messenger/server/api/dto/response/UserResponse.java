@@ -1,21 +1,20 @@
 package dev.crashbandicootfm.messenger.server.api.dto.response;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 @Data
 @Getter
 @Setter
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
 
-    long userId;
+    long id;
 
-    @NotNull String userName;
+    @NotNull String username;
 
-    @NotNull String userPassword;
+    @NotNull String password;
 }

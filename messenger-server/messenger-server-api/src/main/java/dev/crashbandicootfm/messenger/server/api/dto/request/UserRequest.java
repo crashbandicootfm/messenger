@@ -5,11 +5,16 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 @Data
+@Getter
+@Setter
+@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequest {
 
-    @NotNull String username;
+    @NotNull
+    String username;
 
-    @NotNull String password;
-
+    @NotNull
+    String password;
 }

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserController {
 
-    @NotNull UserService userService;
     @NotNull Mapper mapper;
+
+    @NotNull UserService userService;
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
-    public UserResponse registerUser(@NotNull @RequestBody UserRequest userRequest) {
+    public UserResponse registerUser(@RequestBody UserRequest userRequest) {
+        log.info("Requested user: {}", userRequest);
         User user = mapper.map(userRequest, User.class);
         log.info("User: {}", user);
         User registeredUser = userService.registerUser(user);
