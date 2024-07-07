@@ -29,7 +29,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/authentication/**")
+                        .requestMatchers("/api/users/")
                         .permitAll()
                         .anyRequest().authenticated())
                 .build();

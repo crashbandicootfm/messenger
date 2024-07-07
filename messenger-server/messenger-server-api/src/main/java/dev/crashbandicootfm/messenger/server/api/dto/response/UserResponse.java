@@ -15,6 +15,4 @@ public class UserResponse {
     long id;
 
     @NotNull String username;
-
-    @NotNull String password;
 }
