@@ -2,10 +2,10 @@ dependencies {
 
     implementation project(':messenger-server:messenger-server-api')
 
-    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation libs.spring.boot.starter
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor libs.projectlombok.lombok
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation libs.spring.boot.starter.web
 }

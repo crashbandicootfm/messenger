@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version "$springBootVersion"
-    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+    alias libs.plugins.springframework.boot
+    alias libs.plugins.spring.dependencymanagement
 }
 
 subprojects {
@@ -10,24 +10,23 @@ subprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    group = "$projectGroup"
-    version = "$projectVersion"
-
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    compileJava {
+        sourceCompatibility = 17
+        targetCompatibility = 17
+    }
 
     dependencies {
-        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        annotationProcessor libs.projectlombok.lombok
 
-        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+        compileOnly libs.projectlombok.lombok
+        compileOnly libs.jetbrains.annotations
 
-        implementation 'org.springframework.boot:spring-boot-starter'
-        implementation "org.jetbrains:annotations:$jetbrainsAnnotationsVersion"
+        implementation libs.spring.boot.starter
 
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+        testAnnotationProcessor libs.projectlombok.lombok
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+        testCompileOnly libs.projectlombok.lombok
     }
 
     tasks.named('test') {
