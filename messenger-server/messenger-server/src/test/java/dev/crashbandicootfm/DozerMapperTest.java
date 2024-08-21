@@ -1,6 +1,6 @@
 package dev.crashbandicootfm;
 
-import dev.crashbandicootfm.messenger.server.api.dto.request.UserRequest;
+import dev.crashbandicootfm.messenger.server.api.dto.request.user.UserRequest;
 import dev.crashbandicootfm.messenger.server.entity.User;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

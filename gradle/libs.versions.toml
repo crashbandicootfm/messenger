@@ -1,0 +1,23 @@
+[versions]
+spring-boot = '3.2.4'
+spring-dependencymanagement = '1.1.4'
+jetbrains-annotations = '24.1.0'
+mapper = '7.0.0'
+
+[libraries]
+spring-boot-starter = { module = 'org.springframework.boot:spring-boot-starter' }
+
+projectlombok-lombok = { module = 'org.projectlombok:lombok'}
+jetbrains-annotations = { module = 'org.jetbrains:annotations', version.ref = 'jetbrains-annotations' }
+
+dozer-mapper = {module = 'com.github.dozermapper:dozer-core', version.ref = 'mapper'}
+spring-boot-starter-data-jpa = { module = 'org.springframework.boot:spring-boot-starter-data-jpa' }
+spring-boot-starter-web = { module = 'org.springframework.boot:spring-boot-starter-web' }
+spring-boot-starter-webflux = { module = 'org.springframework.boot:spring-boot-starter-webflux' }
+spring-boot-starter-security = { module = 'org.springframework.boot:spring-boot-starter-security' }
+h2 = { module = 'com.h2database:h2' }
+
+
+[plugins]
+springframework-boot = { id = 'org.springframework.boot', version.ref = 'spring-boot' }
+spring-dependencymanagement = { id = 'io.spring.dependency-management', version.ref = 'spring-dependencymanagement' }

@@ -1,8 +1,8 @@
 package dev.crashbandicootfm.messenger.server.controller;
 
 import com.github.dozermapper.core.Mapper;
-import dev.crashbandicootfm.messenger.server.api.dto.request.UserRequest;
-import dev.crashbandicootfm.messenger.server.api.dto.response.UserResponse;
+import dev.crashbandicootfm.messenger.server.api.dto.request.user.UserRequest;
+import dev.crashbandicootfm.messenger.server.api.dto.response.user.UserResponse;
 import dev.crashbandicootfm.messenger.server.entity.User;
 import dev.crashbandicootfm.messenger.server.service.user.UserService;
 import lombok.AccessLevel;
@@ -13,10 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin
-@RestController
 @Slf4j
-@RequestMapping("/api/users")
+@RestController
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserController {
@@ -26,7 +25,7 @@ public class UserController {
     @NotNull UserService userService;
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
+    @PostMapping(value = "/register", produces = "application/json", consumes = "application/json")
     public UserResponse registerUser(@RequestBody UserRequest userRequest) {
         log.info("Requested user: {}", userRequest);
         User user = mapper.map(userRequest, User.class);
@@ -36,9 +35,13 @@ public class UserController {
         return mapper.map(registeredUser, UserResponse.class);
     }
 
-    @PostMapping("/login")
-    public User loginUser(@RequestBody User user) {
-        return userService.loginUser(user);
+    @PostMapping(value = "/login", produces = "application/json", consumes = "application/json")
+    public UserResponse loginUser(@RequestBody UserRequest userRequest) {
+        log.info("Login requested for user: {}", userRequest);
+        User user = mapper.map(userRequest, User.class);
+        User authenticatedUser = userService.loginUser(user);
+        log.info("Authenticated user: {}", authenticatedUser);
+        return mapper.map(authenticatedUser, UserResponse.class);
     }
 
     @DeleteMapping("/{id}")

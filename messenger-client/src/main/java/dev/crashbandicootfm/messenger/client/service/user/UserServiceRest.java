@@ -1,7 +1,7 @@
-package dev.crashbandicootfm.messenger.client.service;
+package dev.crashbandicootfm.messenger.client.service.user;
 
-import dev.crashbandicootfm.messenger.server.api.dto.request.UserRequest;
-import dev.crashbandicootfm.messenger.server.api.dto.response.UserResponse;
+import dev.crashbandicootfm.messenger.server.api.dto.request.user.UserRequest;
+import dev.crashbandicootfm.messenger.server.api.dto.response.user.UserResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,12 +19,22 @@ public class UserServiceRest implements UserService {
 
     @NotNull RestTemplate restTemplate;
 
-    private static final String URL = "http://localhost:8080/api/users/";
+    private static final String URL = "http://localhost:8080/api/v1/users/";
 
     @Override
     public UserResponse registerUser(@NotNull UserRequest userRequest) {
         log.info("Registered user: {}", userRequest);
-        return restTemplate.postForEntity(URL, userRequest, UserResponse.class).getBody();
+        return restTemplate.postForEntity(
+                URL + "register", userRequest, UserResponse.class
+        ).getBody();
+    }
+
+    @Override
+    public UserResponse loginUser(@NotNull UserRequest userRequest) {
+        log.info("Logged in user: {}", userRequest);
+        return restTemplate.postForEntity(
+                URL + "login", userRequest, UserResponse.class
+        ).getBody();
     }
 
     @Override

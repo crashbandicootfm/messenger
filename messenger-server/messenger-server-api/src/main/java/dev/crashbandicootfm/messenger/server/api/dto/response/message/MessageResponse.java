@@ -1,4 +1,4 @@
-package dev.crashbandicootfm.messenger.server.api.dto.request;
+package dev.crashbandicootfm.messenger.server.api.dto.response.message;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,11 +10,9 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 @NoArgsConstructor(force = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserRequest {
+public class MessageResponse {
 
-    @NotNull
-    String username;
+    long id;
 
-    @NotNull
-    String password;
+    @NotNull String message;
 }

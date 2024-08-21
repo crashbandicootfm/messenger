@@ -5,27 +5,24 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
 @ToString
-@Table(name = "app_user")
+@Table(name = "messages")
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@SuppressWarnings("JpaDataSourceORMInspection")
-public class User {
+public class Message {
 
-    @NonNull
-    @Column(updatable = false, nullable = false, unique = true)
-    @NotNull String username;
+    @Id
+    @Column(unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    UUID id;
 
     @NonNull
     @Column(nullable = false)
-    @NotNull String password;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true)
-    long id;
+    @NotNull String message;
 }

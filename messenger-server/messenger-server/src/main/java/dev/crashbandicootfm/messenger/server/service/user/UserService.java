@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 public interface UserService {
 
-    User registerUser(@NotNull User user) throws UserException;
+    @NotNull User registerUser(@NotNull User user) throws UserException;
 
-    User loginUser(@NotNull User user);
+    @NotNull User loginUser(@NotNull User user) throws UserException;
 
-    void deleteUser(Long id);
+    void deleteUser(long id);
 }
