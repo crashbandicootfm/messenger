@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(":messenger-server:messenger-server-api")
+    implementation libs.springdoc.springdoc.openapi.starter.webmvc.ui
+    implementation libs.springframework.spring.boot.starter.data.jpa
+    implementation libs.springframework.spring.boot.starter.web
+    implementation libs.springframework.spring.boot.starter.cache
+    implementation libs.qubique.mediatr
+}

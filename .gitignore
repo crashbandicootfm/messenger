@@ -2,9 +2,10 @@ HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
+!src/main/**/build/
+!src/test/**/build/
+logs
+service/core-service/.env
 ### STS ###
 .apt_generated
 .classpath
@@ -14,17 +15,20 @@ build/
 .springBeans
 .sts4-cache
 bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+!src/main/**/bin/
+!src/test/**/bin/
 
 ### IntelliJ IDEA ###
 .idea
+gradlew
+gradlew.bat
+gradle/wrapper/*
 *.iws
 *.iml
 *.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+!src/main/**/out/
+!src/test/**/out/
 
 ### NetBeans ###
 /nbproject/private/

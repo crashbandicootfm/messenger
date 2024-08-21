@@ -1,32 +1,29 @@
 plugins {
-    id 'java'
+    id 'java-library'
     alias libs.plugins.springframework.boot
-    alias libs.plugins.spring.dependencymanagement
+    alias libs.plugins.spring.dependency.management
 }
 
 subprojects {
 
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    compileJava {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     dependencies {
         annotationProcessor libs.projectlombok.lombok
+        annotationProcessor libs.springframework.spring.boot.configuration.processor
+        compileOnlyApi libs.projectlombok.lombok
+        compileOnlyApi libs.jetbrains.annotations
 
-        compileOnly libs.projectlombok.lombok
-        compileOnly libs.jetbrains.annotations
-
-        implementation libs.spring.boot.starter
-
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testAnnotationProcessor libs.projectlombok.lombok
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         testCompileOnly libs.projectlombok.lombok
+        testCompileOnly libs.jetbrains.annotations
     }
 
     tasks.named('test') {

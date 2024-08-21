@@ -1,0 +1,61 @@
+[versions]
+# Spring plugins
+springframework-boot = '3.2.3'
+spring-dependency-management = '1.1.4'
+
+#Grpc plugins
+protobuf-plugin = '0.9.4'
+
+springframework-spring-data-common = '3.2.4'
+
+# Utility
+projectlombok-lombok = '1.18.30'
+jetbrains-annotations = '24.1.0'
+
+# Grpc
+devh-grpc-spring-boot = '3.1.0.RELEASE'
+google-protobuf-java = '3.5.1'
+javax-annotation = '1.3.2'
+grpc = '1.64.0'
+
+# Documentation
+springdoc-springdoc-openapi-starter-webmvc-ui = '2.6.0'
+
+# Qubique
+qubique-mediatr = '0.0.0.1-SNAPSHOT'
+
+[libraries]
+# Spring
+springframework-spring-data-commons = { module = 'org.springframework.data:spring-data-commons', version.ref = 'springframework-spring-data-common' }
+springframework-spring-boot-starter = { module = 'org.springframework.boot:spring-boot-starter' }
+springframework-spring-boot-starter-aop = { module = 'org.springframework.boot:spring-boot-starter-aop' }
+springframework-spring-boot-configuration-processor = { module = 'org.springframework.boot:spring-boot-configuration-processor' }
+springframework-spring-boot-starter-data-jpa = { module = 'org.springframework.boot:spring-boot-starter-data-jpa' }
+springframework-spring-boot-starter-web = { module = 'org.springframework.boot:spring-boot-starter-web' }
+springframework-spring-boot-starter-cache = { module = 'org.springframework.boot:spring-boot-starter-cache' }
+springframework-spring-boot-starter-validation = { module = 'org.springframework.boot:spring-boot-starter-validation' }
+
+# Utility
+projectlombok-lombok = { module = 'org.projectlombok:lombok', version.ref = 'projectlombok-lombok' }
+jetbrains-annotations = { module = 'org.jetbrains:annotations', version.ref = 'jetbrains-annotations' }
+
+# Grpc
+devh-grpc-common-spring-boot = { module = 'net.devh:grpc-common-spring-boot', version.ref = 'devh-grpc-spring-boot' }
+devh-grpc-client-spring-boot-starter = { module = 'net.devh:grpc-client-spring-boot-starter', version.ref = 'devh-grpc-spring-boot' }
+devh-grpc-server-spring-boot-starter = { module = 'net.devh:grpc-server-spring-boot-starter', version.ref = 'devh-grpc-spring-boot' }
+grpc-all = { module = 'io.grpc:grpc-all', version.ref = 'grpc' }
+google-protobuf-java = { module = 'com.google.protobuf:protobuf-java', version.ref = 'google-protobuf-java' }
+javax-annotation = { module = 'javax.annotation:javax.annotation-api', version.ref = 'javax-annotation' }
+
+#Documentation
+springdoc-springdoc-openapi-starter-webmvc-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc-springdoc-openapi-starter-webmvc-ui' }
+
+# Qubique
+qubique-mediatr = { module = 'pw.qubique.mediatr:mediatr', version.ref = 'qubique-mediatr' }
+
+[plugins]
+# Spring plugins
+springframework-boot = { id = 'org.springframework.boot', version.ref = 'springframework-boot' }
+spring-dependency-management = { id = 'io.spring.dependency-management', version.ref = 'spring-dependency-management' }
+protobuf-plugin = {id = 'com.google.protobuf', version.ref = 'protobuf-plugin' }
+

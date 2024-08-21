@@ -7,11 +7,22 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        maven {
+            name = 'Qubique'
+            url = 'https://gitlab.com/api/v4/groups/89652579/-/packages/maven'
+            boolean isCiTask = System.getenv("CI_JOB_TOKEN") != null
+            credentials(HttpHeaderCredentials) {
+                name = isCiTask ? 'Job-Token' : 'Private-Token'
+                value = isCiTask ? System.getenv("CI_JOB_TOKEN") : System.getenv("QUBIQUE_GITLAB_TOKEN")
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
     }
 }
 
 rootProject.name = 'messenger'
-include 'messegerclient', 'messengerserver'
 
 [
         'messenger-client',
@@ -21,3 +32,19 @@ include 'messegerclient', 'messengerserver'
 ].forEach {
     include it
 }
+
+rootProject.children.each { project ->
+    {
+        setProjectBuildFileName(project)
+    }
+}
+
+void setProjectBuildFileName(project) {
+    project.buildFileName = "${project.name}.gradle"
+    project.children.each { subproject ->
+        {
+            setProjectBuildFileName(subproject)
+        }
+    }
+}
+
