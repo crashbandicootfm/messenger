@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -19,6 +20,8 @@ public class ChatResponse {
 
   @NotNull Date createdAt;
 
-  @NotNull Long createBy;
+  @NotNull Long createdBy;
+
+  @NotNull List<Long> userIds;
 
 }

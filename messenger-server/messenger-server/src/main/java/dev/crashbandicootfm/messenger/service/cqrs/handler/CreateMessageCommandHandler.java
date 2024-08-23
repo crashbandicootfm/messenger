@@ -31,7 +31,7 @@ public class CreateMessageCommandHandler implements CommandHandler<CreateMessage
       throw new UserException("User %s not found!".formatted(command.getUserId()));
     }
     MessageModel model = MessageModel.builder()
-        .userId(command.getUserId())
+        .createdBy(command.getUserId())
         .sentAt(new Date())
         .chatId(command.getChatId())
         .message(command.getMessage())

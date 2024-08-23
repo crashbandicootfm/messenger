@@ -27,8 +27,8 @@ public class MessageModel {
   @Column(name = "sent_at", updatable = false, nullable = false)
   Date sentAt;
 
-  @Column(name = "user_id", updatable = false, nullable = false)
-  Long userId;
+  @Column(name = "created_by", updatable = false, nullable = false)
+  Long createdBy;
 
   @Column(name = "chat_id", updatable = false, nullable = false)
   Long chatId;

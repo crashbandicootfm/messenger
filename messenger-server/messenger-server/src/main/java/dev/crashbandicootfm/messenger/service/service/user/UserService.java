@@ -12,11 +12,11 @@ public interface UserService {
 
   boolean existsByUsername(@NotNull String username);
 
-  @NotNull Optional<UserModel> findById(@NotNull String id);
+  @NotNull Optional<UserModel> findById(@NotNull Long id);
 
   @NotNull Optional<UserModel> findByUsername(@NotNull String username);
 
-  @NotNull UserModel getById(@NotNull String id) throws UserException;
+  @NotNull UserModel getById(@NotNull Long id) throws UserException;
 
   @NotNull UserModel getByUsername(@NotNull String username) throws UserException;
 
