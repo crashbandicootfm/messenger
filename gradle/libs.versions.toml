@@ -36,6 +36,10 @@ springframework-spring-boot-starter-web = { module = 'org.springframework.boot:s
 springframework-spring-boot-starter-cache = { module = 'org.springframework.boot:spring-boot-starter-cache' }
 springframework-spring-boot-starter-validation = { module = 'org.springframework.boot:spring-boot-starter-validation' }
 springframework-spring-boot-starter-security = { module = 'org.springframework.boot:spring-boot-starter-security' }
+springframework-spring-devtools = { module = 'org.springframework.boot:spring-boot-devtools' }
+
+# H2
+h2 = { module = 'com.h2database:h2' }
 
 # Utility
 projectlombok-lombok = { module = 'org.projectlombok:lombok', version.ref = 'projectlombok-lombok' }

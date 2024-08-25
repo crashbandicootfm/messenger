@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import pw.qubique.mediatr.Mediatr;
 
-@RequiredArgsConstructor
 @RestController("/api/v1/chats")
+@RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChatController {
 
@@ -26,10 +26,12 @@ public class ChatController {
   @NotNull Mapper mapper;
 
   @PostMapping("/")
-  public ChatResponse create(@NotNull @RequestBody CreateChatRequest request, @AuthenticationPrincipal UserDetailsImpl principal) {
+  public ChatResponse create(
+          @NotNull @RequestBody CreateChatRequest request,
+          @AuthenticationPrincipal UserDetailsImpl principal
+  ) {
     CreateChatCommand command = new CreateChatCommand(principal.getId(), request.getName());
     ChatModel model = mediatr.dispatch(command, ChatModel.class);
     return mapper.map(model, ChatResponse.class);
   }
-
 }

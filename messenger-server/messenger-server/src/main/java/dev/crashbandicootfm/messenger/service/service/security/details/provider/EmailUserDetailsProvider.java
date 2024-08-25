@@ -1,5 +1,7 @@
 package dev.crashbandicootfm.messenger.service.service.security.details.provider;
 
+import dev.crashbandicootfm.messenger.service.service.security.details.UserDetailsImpl;
+import dev.crashbandicootfm.messenger.service.service.user.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +19,8 @@ import java.util.regex.Pattern;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class EmailUserDetailsProvider implements UserDetailsProvider {
 
+  @NotNull UserService userService;
+
   private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
 
   @Override
@@ -26,6 +30,10 @@ public class EmailUserDetailsProvider implements UserDetailsProvider {
 
   @Override
   public @NotNull UserDetails getByLogin(@NotNull String login) throws UsernameNotFoundException {
-    return null;
+    return userService.findByUsername(login)
+        .map(UserDetailsImpl::new)
+        .orElseThrow(
+                 () -> new UsernameNotFoundException(String.format("User with username %s not found", login))
+        );
   }
 }

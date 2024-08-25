@@ -1,7 +1,6 @@
 package dev.crashbandicootfm.messenger.service.service.security.details;
 
 import dev.crashbandicootfm.messenger.service.service.security.details.provider.UserDetailsProvider;
-import dev.crashbandicootfm.messenger.service.service.user.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,5 +35,4 @@ public class ProviderUserDetailsService implements UserDetailsService {
         .orElseThrow(() -> new UsernameNotFoundException("No supported providers found!"));
     return provider.getByLogin(username);
   }
-
 }

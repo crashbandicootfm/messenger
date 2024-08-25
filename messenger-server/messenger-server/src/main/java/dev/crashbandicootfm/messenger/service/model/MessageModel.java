@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 @Builder
 @AllArgsConstructor
-@Table(schema = "messenger", name = "users")
+@Table(name = "messages")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuppressWarnings("JpaDataSourceORMInspection")

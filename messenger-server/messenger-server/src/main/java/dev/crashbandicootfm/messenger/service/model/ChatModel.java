@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Builder
 @AllArgsConstructor
-@Table(schema = "messenger", name = "chats")
+@Table(name = "chats")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuppressWarnings("JpaDataSourceORMInspection")

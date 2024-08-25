@@ -4,12 +4,14 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
-@Setter
 @Getter
+@Setter
 @RequiredArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateChatRequest {
+public class MessageRequest {
 
-  @NotNull String name;
+    @NotNull String message;
+
+    @NotNull Long chatId;
 }

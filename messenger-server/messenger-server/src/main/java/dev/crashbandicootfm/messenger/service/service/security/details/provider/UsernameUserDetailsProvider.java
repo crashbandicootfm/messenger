@@ -29,7 +29,7 @@ public class UsernameUserDetailsProvider implements UserDetailsProvider {
     return userService.findByUsername(login)
         .map(UserDetailsImpl::new)
         .orElseThrow(
-            () -> new UsernameNotFoundException(String.format("User with username %s not found", login))
+                () -> new UsernameNotFoundException(String.format("User with username %s not found", login))
         );
   }
 }
