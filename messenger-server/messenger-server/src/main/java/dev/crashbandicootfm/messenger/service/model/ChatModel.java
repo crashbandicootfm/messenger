@@ -34,11 +34,11 @@ public class ChatModel {
   @Column(name = "created_by", updatable = false, nullable = false)
   Long createdBy;
   
-  @ElementCollection
-  @CollectionTable(
-      name = "users_chats",
-      joinColumns = @JoinColumn(name = "user_id")
-  )
-  List<Long> userIds = new ArrayList<>();
+//  @ElementCollection
+//  @CollectionTable(
+//      name = "users_chats",
+//      joinColumns = @JoinColumn(name = "user_id")
+//  )
+//  List<Long> userIds = new ArrayList<>();
 
 }

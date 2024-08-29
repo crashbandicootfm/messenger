@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public @NotNull UserModel save(@NotNull UserModel user) {
+  public @NotNull UserModel registerUser(@NotNull UserModel user) {
     return userRepository.save(user);
   }
 }

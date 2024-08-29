@@ -3,20 +3,17 @@ package dev.crashbandicootfm.messenger.service.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Entity
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @Table(name = "users")
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @SuppressWarnings("JpaDataSourceORMInspection")
 public class UserModel {
 
@@ -30,10 +27,10 @@ public class UserModel {
   @Column(name = "password", nullable = false, updatable = false)
   String password;
 
-  @ElementCollection
-  @CollectionTable(
-      name = "users_chats",
-      joinColumns = @JoinColumn(name = "chat_id")
-  )
-  List<Long> chatIds = new ArrayList<>();
+//  @ElementCollection
+//  @CollectionTable(
+//      name = "users_chats",
+//      joinColumns = @JoinColumn(name = "chat_id")
+//  )
+//  List<Long> chatIds = new ArrayList<>();
 }

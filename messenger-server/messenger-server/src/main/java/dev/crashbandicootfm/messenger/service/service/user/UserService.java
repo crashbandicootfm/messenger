@@ -20,5 +20,5 @@ public interface UserService {
 
   @NotNull UserModel getByUsername(@NotNull String username) throws UserException;
 
-  @NotNull UserModel save(@NotNull UserModel user);
+  @NotNull UserModel registerUser(@NotNull UserModel user);
 }

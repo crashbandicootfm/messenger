@@ -25,7 +25,7 @@ public class ProviderUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
     UserDetailsProvider provider = providers.stream()
-        .filter(p -> p.supports(username))
+        .filter(p -> p. supports(username))
         .min(Comparator.comparingInt(
             p -> Optional.ofNullable(
                     p.getClass().getAnnotation(Order.class))

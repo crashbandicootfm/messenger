@@ -3,32 +3,35 @@ package dev.crashbandicootfm.messenger.service.controller.v1;
 import com.github.dozermapper.core.Mapper;
 import dev.crashbandicootfm.messenger.service.api.request.UserRequest;
 import dev.crashbandicootfm.messenger.service.api.response.UserResponse;
+import dev.crashbandicootfm.messenger.service.cqrs.command.CreateUserCommand;
 import dev.crashbandicootfm.messenger.service.model.UserModel;
-import dev.crashbandicootfm.messenger.service.service.user.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pw.qubique.mediatr.Mediatr;
 
-@RestController("/api/v1/users")
+@Slf4j
+@CrossOrigin
+@RestController
+@RequestMapping("/api/v1/users/")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserController {
 
-    @NotNull UserService userService;
-
     @NotNull Mapper mapper;
+
+    @NotNull Mediatr mediatr;
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
-    public @NotNull UserResponse saveUser(@RequestBody UserRequest userRequest) {
-        UserModel user = mapper.map(userRequest, UserModel.class);
-        UserModel registeredUser = userService.save(user);
-        return mapper.map(registeredUser, UserResponse.class);
+    public UserResponse registerUser(@RequestBody UserRequest userRequest) {
+        CreateUserCommand command = new CreateUserCommand(userRequest.getUsername(), userRequest.getPassword());
+
+        UserModel model = mediatr.dispatch(command, UserModel.class);
+        return mapper.map(model, UserResponse.class);
     }
 }
