@@ -27,10 +27,10 @@ public class UserModel {
   @Column(name = "password", nullable = false, updatable = false)
   String password;
 
-//  @ElementCollection
-//  @CollectionTable(
-//      name = "users_chats",
-//      joinColumns = @JoinColumn(name = "chat_id")
-//  )
-//  List<Long> chatIds = new ArrayList<>();
+  @ElementCollection
+  @CollectionTable(
+      name = "users_chats",
+      joinColumns = @JoinColumn(name = "chat_id")
+  )
+  List<Long> chatIds = new ArrayList<>();
 }

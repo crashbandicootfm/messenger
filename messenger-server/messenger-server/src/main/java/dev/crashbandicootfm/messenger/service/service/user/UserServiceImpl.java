@@ -39,6 +39,11 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public @NotNull Optional<UserModel> getUserOptional(@NotNull String username) {
+    return userRepository.findByUsername(username);
+  }
+
+  @Override
   public @NotNull UserModel getById(@NotNull Long id) throws UserException {
     return userRepository.findById(id).orElseThrow(
         () -> new UserException("User not found!")

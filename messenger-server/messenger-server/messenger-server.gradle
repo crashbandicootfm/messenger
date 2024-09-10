@@ -9,4 +9,8 @@ dependencies {
     implementation libs.github.dozer.core
     developmentOnly libs.springframework.spring.devtools
     runtimeOnly libs.h2
+
+    implementation libs.jwt.impl
+    implementation libs.jwt.api
+    implementation libs.jwt.jackson
 }

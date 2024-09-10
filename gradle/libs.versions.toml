@@ -19,11 +19,14 @@ google-protobuf-java = '3.5.1'
 javax-annotation = '1.3.2'
 grpc = '1.64.0'
 
+# Jwt
+jjwt = '0.12.3'
+
 # Documentation
 springdoc-springdoc-openapi-starter-webmvc-ui = '2.6.0'
 
 # Qubique
-qubique-mediatr = '0.0.0.1-SNAPSHOT'
+qubique-mediatr = '0.0.0.2-SNAPSHOT'
 
 [libraries]
 # Spring
@@ -45,6 +48,10 @@ h2 = { module = 'com.h2database:h2' }
 projectlombok-lombok = { module = 'org.projectlombok:lombok', version.ref = 'projectlombok-lombok' }
 jetbrains-annotations = { module = 'org.jetbrains:annotations', version.ref = 'jetbrains-annotations' }
 github-dozer-core = { module = 'com.github.dozermapper:dozer-core', version.ref = 'github-dozer-core'}
+
+jwt-impl = { module = 'io.jsonwebtoken:jjwt-impl', version.ref = 'jjwt'}
+jwt-api = { module = 'io.jsonwebtoken:jjwt-api', version.ref = 'jjwt' }
+jwt-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 'jjwt' }
 
 # Grpc
 devh-grpc-common-spring-boot = { module = 'net.devh:grpc-common-spring-boot', version.ref = 'devh-grpc-spring-boot' }

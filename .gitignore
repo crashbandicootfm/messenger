@@ -39,3 +39,5 @@ out/
 
 ### VS Code ###
 .vscode/
+
+/messenger-server/messenger-server/.env

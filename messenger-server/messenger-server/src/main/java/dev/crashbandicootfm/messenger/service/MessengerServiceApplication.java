@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(
     scanBasePackages = {
-        "pw.qubique.mediatr",
         "dev.crashbandicootfm.messenger.service"
     }
 )

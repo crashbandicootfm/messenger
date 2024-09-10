@@ -14,12 +14,12 @@ import org.springframework.web.client.RestTemplate;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChatServiceRest implements ChatService {
 
-    private static final String URL = "http://localhost:8080/api/v1/chats";
+    private static final String URL = "http://localhost:8080/api/v1/chats/";
 
     @NotNull RestTemplate restTemplate;
 
     @Override
-    public @NotNull ChatResponse create(@NotNull CreateChatRequest request) {
+    public ChatResponse create(@NotNull CreateChatRequest request) {
         return restTemplate.postForEntity(URL, request, ChatResponse.class).getBody();
     }
 }

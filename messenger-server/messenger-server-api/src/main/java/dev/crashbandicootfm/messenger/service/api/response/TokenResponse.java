@@ -4,25 +4,13 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
-import java.util.List;
-
 @Data
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChatResponse {
+public class TokenResponse {
 
-  @NotNull Long id;
-
-  @NotNull String name;
-
-  @NotNull Date createdAt;
-
-  @NotNull Long createdBy;
-
-  @NotNull List<Long> userIds;
-
+    @NotNull String token;
 }

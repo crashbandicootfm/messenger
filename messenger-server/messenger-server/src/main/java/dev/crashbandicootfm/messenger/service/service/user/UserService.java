@@ -16,6 +16,8 @@ public interface UserService {
 
   @NotNull Optional<UserModel> findByUsername(@NotNull String username);
 
+  @NotNull Optional<UserModel> getUserOptional(@NotNull String username);
+
   @NotNull UserModel getById(@NotNull Long id) throws UserException;
 
   @NotNull UserModel getByUsername(@NotNull String username) throws UserException;

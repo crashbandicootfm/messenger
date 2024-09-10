@@ -1,6 +1,9 @@
 package dev.crashbandicootfm.messenger.client.service.user;
 
+import dev.crashbandicootfm.messenger.service.api.request.AuthenticationRequest;
+import dev.crashbandicootfm.messenger.service.api.request.RegistrationRequest;
 import dev.crashbandicootfm.messenger.service.api.request.UserRequest;
+import dev.crashbandicootfm.messenger.service.api.response.TokenResponse;
 import dev.crashbandicootfm.messenger.service.api.response.UserResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,4 +28,14 @@ public class UserServiceRest implements UserService {
         log.info("Registered user: {}", userRequest);
         return restTemplate.postForEntity(URL, userRequest, UserResponse.class).getBody();
     }
+
+//    @Override
+//    public TokenResponse authenticateUser(@NotNull AuthenticationRequest authenticationRequest) {
+//        return restTemplate.postForObject(URL + "login", authenticationRequest, TokenResponse.class);
+//    }
+//
+//    @Override
+//    public TokenResponse register(@NotNull RegistrationRequest registrationRequest) {
+//        return restTemplate.postForObject(URL + "register", registrationRequest, TokenResponse.class);
+//    }
 }

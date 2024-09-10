@@ -6,5 +6,5 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ChatService {
 
-    @NotNull ChatResponse create(@NotNull CreateChatRequest request);
+    ChatResponse create(@NotNull CreateChatRequest request);
 }

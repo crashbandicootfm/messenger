@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pw.qubique.mediatr.Mediatr;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/chats/")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChatController {
