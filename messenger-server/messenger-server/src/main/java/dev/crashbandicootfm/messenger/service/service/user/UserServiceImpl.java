@@ -3,6 +3,7 @@ package dev.crashbandicootfm.messenger.service.service.user;
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.UserModel;
 import dev.crashbandicootfm.messenger.service.repository.UserRepository;
+import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +62,25 @@ public class UserServiceImpl implements UserService {
   @Override
   public @NotNull UserModel registerUser(@NotNull UserModel user) {
     return userRepository.save(user);
+  }
+
+  @Override
+  public @NotNull UserModel uploadAvatar(@NotNull Long userId, @NotNull MultipartFile file) throws UserException, IOException {
+    UserModel user = userRepository.findById(userId).orElseThrow(
+        () -> new UserException("User not found!")
+    );
+
+    if (file.isEmpty()) {
+      throw new UserException("File is empty!");
+    }
+
+    user.setProfileImage(file.getBytes());
+    return userRepository.save(user);
+  }
+
+  @Override
+  public byte[] getUserAvatar(Long userId) {
+    UserModel user = userRepository.findById(userId).orElseThrow(() -> new UserException("User not found!"));
+    return user.getProfileImage();
   }
 }

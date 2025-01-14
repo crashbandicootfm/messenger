@@ -33,4 +33,8 @@ public class UserModel {
       joinColumns = @JoinColumn(name = "chat_id")
   )
   List<Long> chatIds = new ArrayList<>();
+
+  @Column(name = "profile_image")
+  @Lob
+  byte[] profileImage;
 }

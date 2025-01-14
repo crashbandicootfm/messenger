@@ -1,11 +1,11 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
     alias libs.plugins.springframework.boot
     alias libs.plugins.spring.dependency.management
 }
 
 subprojects {
-
     apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
@@ -24,6 +24,7 @@ subprojects {
         testAnnotationProcessor libs.projectlombok.lombok
         testCompileOnly libs.projectlombok.lombok
         testCompileOnly libs.jetbrains.annotations
+        implementation 'dev.crashbandicootfm:mediator:1.0.0'
     }
 
     tasks.named('test') {

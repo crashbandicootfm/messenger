@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:file:~/messenger_database-cache
+    url: jdbc:h2:file:~/messenger_database-cache1
     username: user
     password: user
     driver-class-name: org.h2.Driver
@@ -21,5 +21,5 @@ server:
   port: 8080
 
 jwt:
-  secret: JAa1pNI7N7JsQaz0uyrGEKi2MLrP16DUmNvavGTe/Po=
+  secret: ${secret}
   lifetime: 180000

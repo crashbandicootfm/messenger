@@ -1,0 +1,507 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f4f8;
+  color: #4a4a4a;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+.messenger-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.messenger-root.dark {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+.messenger-root .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.messenger-root.dark .header {
+  background-color: #2e3b48;
+  color: #f9fafb;
+}
+
+.messenger-root .header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.messenger-root .app-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 70px;
+  height: 35px;
+}
+
+.theme-checkbox {
+  display: none;
+}
+
+.theme-label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #e5e7eb;
+  border-radius: 50px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.theme-checkbox:checked + .theme-label {
+  background-color: #48bb78;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.theme-checkbox:checked + .theme-label .toggle-slider {
+  transform: translateX(35px);
+}
+
+.icon {
+  font-size: 18px;
+  transition: opacity 0.3s ease;
+}
+
+.icon.sun {
+  opacity: 1;
+}
+
+.theme-checkbox:checked + .theme-label .icon.sun {
+  opacity: 0;
+}
+
+.icon.moon {
+  opacity: 0;
+}
+
+.theme-checkbox:checked + .theme-label .icon.moon {
+  opacity: 1;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.welcome-card {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2.5rem;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.messenger-root.dark .welcome-card {
+  background-color: #2e3b48;
+  color: #f9fafb;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.action-button {
+  padding: 1.2rem 2.5rem;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #81c784, #66bb6a);
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.action-button:hover {
+  background: linear-gradient(135deg, #66bb6a, #4caf50);
+  transform: translateY(-5px);
+}
+
+.messenger-root.dark .action-button {
+  background: linear-gradient(135deg, #38a169, #2f855a); /* Мягкий тёмный зелёный */
+}
+
+.messenger-root.dark .action-button:hover {
+  background: linear-gradient(135deg, #2f855a, #276747);
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+.menu-icon:hover {
+  color: #81c784;
+}
+
+.menu-button {
+  display: block;
+  padding: 1rem 1.8rem;
+  font-size: 1rem;
+  background-color: transparent;
+  color: #555555;
+  border: 2px solid #81c784;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 200px;
+  text-align: center;
+  margin: 10px auto;
+  font-weight: 600;
+}
+
+.menu-button:hover {
+  background-color: #81c784;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.menu-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button.back-button {
+  background-color: #f5f5f5;
+  color: #81c784;
+  border-color: #81c784;
+}
+
+.menu-button.back-button:hover {
+  background-color: #81c784;
+  color: #ffffff;
+}
+
+.menu-button.change-avatar-button {
+  background-color: #ffffff;
+  color: #555555;
+  border-color: #81c784;
+}
+
+.menu-button.change-avatar-button:hover {
+  background-color: #81c784;
+  color: #ffffff;
+}
+
+.messenger-root.dark .menu-button {
+  background-color: #2e3b48;
+  color: #f9fafb;
+  border-color: #81c784;
+}
+
+.messenger-root.dark .menu-button:hover {
+  background-color: #81c784;
+  color: #2e3b48;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+}
+
+.messenger-root.dark .menu-button.back-button {
+  background-color: #2e3b48;
+  color: #81c784;
+}
+
+.messenger-root.dark .menu-button.back-button:hover {
+  background-color: #81c784;
+  color: #2e3b48;
+}
+
+.messenger-root.dark .menu-button.change-avatar-button {
+  background-color: #2e3b48;
+  color: #f9fafb;
+}
+
+.messenger-root.dark .menu-button.change-avatar-button:hover {
+  background-color: #81c784;
+  color: #2e3b48;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  color: #333333;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.messenger-root.dark .header {
+  background-color: #2e3b48;
+  color: #f9fafb;
+}
+
+.profile-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.profile-avatar {
+  width: 45px;
+  height: 45px;
+  background-color: #66bb6a;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+}
+
+.messenger-root.dark .avatar-section {
+  background-color: #2e3b48;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+}
+
+.messenger-root.dark .avatar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.profile-section:hover .profile-avatar {
+  background-color: #81c784;
+}
+
+.profile-menu {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 70px;
+  left: 10px;
+  width: 10%;
+  height: 40vh;
+  background-color: #ffffff;
+  color: #333333;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem;
+  opacity: 0;
+  transform: translateY(-10%);
+  transition: opacity 0.3s ease, transform 0.3s ease-in-out;
+  visibility: hidden;
+  z-index: 1000;
+}
+
+.profile-menu.show {
+  opacity: 1;
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.messenger-root.dark .profile-menu {
+  background-color: #2e3b48;
+  color: #f9fafb;
+}
+
+.profile-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-menu li {
+  margin-bottom: 1.2rem;
+}
+
+.profile-menu li:last-child {
+  margin-bottom: 0;
+}
+
+.profile-menu a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.profile-menu a:hover {
+  color: #81c784;
+}
+
+.messenger-root.dark .profile-menu a:hover {
+  color: #66bb6a;
+}
+
+.messenger-root.dark .header {
+  background-color: #2c3847;
+  color: #e5e7eb;
+}
+
+.messenger-root.dark .action-button {
+  background: linear-gradient(135deg, #3c8d63, #2f6852);
+}
+
+.messenger-root.dark .action-button:hover {
+  background: linear-gradient(135deg, #2f6852, #255442);
+}
+
+
+.app-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: inherit;
+  margin: 0;
+}
+
+@keyframes menuSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-menu.show {
+  animation: menuSlideDown 0.3s ease-out;
+}
+
+.profile-info {
+  background-color: white;
+}
+
+.profile-info h3 {
+  margin-top: 0;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  font-size: 1.5em;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.profile-info p {
+  font-family: 'Arial', sans-serif;
+  font-size: 1.2em;
+  color: #0b0a0a;
+}
+
+.profile-info strong {
+  color: #0b0a0a;
+}
+
+.profile-info button {
+  background-color: #388e3c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.profile-info button:hover {
+  background-color: #2c6e2f;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-info button:active {
+  transform: scale(1.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.messenger-root.dark .profile-info {
+  background-color: #2e3b48;
+  color: #f9fafb;
+}
+
+.messenger-root.dark .profile-info h3 {
+  color: white;
+}
+
+.messenger-root.dark .profile-info p {
+  color: #f9fafb;
+}
+
+.messenger-root.dark .profile-info strong {
+  color: #f9fafb;
+}
+
+.messenger-root.dark .profile-info button {
+  background-color: #388e3c;
+  color: white;
+}
+
+.messenger-root.dark .profile-info button:hover {
+  background-color: #2c6e2f;
+}
+
+.messenger-root.dark .profile-info button:active {
+  transform: scale(1.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

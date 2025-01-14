@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(
     scanBasePackages = {
-        "dev.crashbandicootfm.messenger.service"
+        "dev.crashbandicootfm"
     }
 )
 @EntityScan(basePackages = "dev.crashbandicootfm.messenger.service.model")

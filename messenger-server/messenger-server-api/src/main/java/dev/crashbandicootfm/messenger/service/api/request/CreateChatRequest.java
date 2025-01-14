@@ -2,13 +2,13 @@ package dev.crashbandicootfm.messenger.service.api.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.jetbrains.annotations.NotNull;
 
 @Setter
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateChatRequest {
 
-  @NotNull String name;
+   @NonNull String name;
 }

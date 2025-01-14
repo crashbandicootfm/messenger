@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messenger</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="messenger-root" [class.dark]="darkMode">
+  <header class="header">
+    <div class="profile-section">
+      <button class="menu-icon" (click)="toggleProfileMenu()">≡</button>
+
+      <div class="profile-menu" [ngClass]="{'show': showProfileMenu}">
+        <ul *ngIf="!viewingProfile; else profileInfo">
+          <li>
+            <button class="menu-button" (click)="viewProfile()">
+              <i class="fas fa-user"></i> Profile
+            </button>
+          </li>
+          <li>
+            <button class="menu-button" (click)="openSettings()">
+              <i class="fas fa-cog"></i> Settings
+            </button>
+          </li>
+          <li>
+            <button class="menu-button" (click)="toggleTheme()">
+              <i class="fas fa-moon"></i> Dark theme
+            </button>
+          </li>
+          <li>
+            <button class="menu-button" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </li>
+        </ul>
+
+        <ng-template #profileInfo>
+          <div class="profile-info" [class.expanded]="isChangingAvatar">
+            <h3>Your profile</h3>
+            <p><strong>Hi, </strong> {{ username }}</p>
+
+            <div class="avatar-section">
+              <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar" class="avatar">
+              <p *ngIf="!avatarUrl">No avatar uploaded</p>
+            </div>
+
+            <button class="menu-button" (click)="backToMainMenu()">Back</button>
+            <button class="menu-button" (click)="changeAvatar()">Change Avatar</button>
+
+            <div *ngIf="isChangingAvatar">
+              <input type="file" (change)="onFileSelected($event)" accept="image/*">
+              <button (click)="uploadAvatar()">Upload</button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+    <div class="header-actions">
+      <h1 class="app-title">Messenger</h1>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="welcome-card">
+      <h2>Welcome to Messenger</h2>
+      <p>Start chatting with your friends or join a chat room to connect with others.</p>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-button" (click)="createChat()">Create Chat</button>
+      <button class="action-button" (click)="joinChat()">Join Chat</button>
+    </div>
+
+    <div *ngIf="showProfile" class="profile-info">
+      <h3>Profile Information</h3>
+      <p><strong>Username:</strong> {{ username }}</p>
+      <button class="menu-button" (click)="changeAvatar()">Change Avatar</button>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

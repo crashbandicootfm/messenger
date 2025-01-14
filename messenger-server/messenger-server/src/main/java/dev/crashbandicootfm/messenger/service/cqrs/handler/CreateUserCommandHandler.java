@@ -1,5 +1,6 @@
 package dev.crashbandicootfm.messenger.service.cqrs.handler;
 
+import dev.crashbandicootfm.mediator.model.CommandHandler;
 import dev.crashbandicootfm.messenger.service.cqrs.command.CreateUserCommand;
 import dev.crashbandicootfm.messenger.service.model.UserModel;
 import dev.crashbandicootfm.messenger.service.service.user.UserService;
@@ -8,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pw.qubique.mediatr.command.CommandHandler;
 
 @Component
 @RequiredArgsConstructor

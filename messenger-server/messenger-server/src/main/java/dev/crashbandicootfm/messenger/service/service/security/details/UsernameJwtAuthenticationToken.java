@@ -25,6 +25,6 @@ public class UsernameJwtAuthenticationToken extends AbstractAuthenticationToken 
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return userDetails;
     }
 }

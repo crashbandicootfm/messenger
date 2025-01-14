@@ -1,0 +1,9 @@
+### GET request to example server
+POST http://localhost:8080/api/v1/chats/
+Content-Type: application/json
+
+{
+  "name": "chat"
+}
+
+###

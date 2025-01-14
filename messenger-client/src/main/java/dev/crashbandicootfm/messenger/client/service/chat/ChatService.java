@@ -6,5 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ChatService {
 
-    ChatResponse create(@NotNull CreateChatRequest request);
+    ChatResponse create(@NotNull CreateChatRequest request, @NotNull String token);
+
+    ChatResponse findByName(@NotNull String name, @NotNull String token);
 }

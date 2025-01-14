@@ -2,4 +2,18 @@ dependencies {
     implementation project(":messenger-server:messenger-server-api")
     implementation libs.springdoc.springdoc.openapi.starter.webmvc.ui
     implementation libs.springframework.spring.boot.starter.web
+
+    implementation libs.springdoc.springdoc.openapi.starter.webmvc.ui
+    implementation libs.springframework.spring.boot.starter.data.jpa
+    implementation libs.springframework.spring.boot.starter.web
+    implementation libs.springframework.spring.boot.starter.cache
+    implementation libs.springframework.spring.boot.starter.security
+    implementation libs.github.dozer.core
+    developmentOnly libs.springframework.spring.devtools
+    runtimeOnly libs.h2
+
+    implementation libs.jwt.impl
+    implementation libs.jwt.api
+    implementation libs.jwt.jackson
+    implementation libs.mediator
 }

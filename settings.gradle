@@ -7,22 +7,20 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        maven { url 'https://jitpack.io' }
         maven {
-            name = 'Qubique'
-            url = 'https://gitlab.com/api/v4/groups/89652579/-/packages/maven'
-            boolean isCiTask = System.getenv("CI_JOB_TOKEN") != null
-            credentials(HttpHeaderCredentials) {
-                name = isCiTask ? 'Job-Token' : 'Private-Token'
-                value = isCiTask ? System.getenv("CI_JOB_TOKEN") : System.getenv("QUBIQUE_GITLAB_TOKEN")
-            }
-            authentication {
-                header(HttpHeaderAuthentication)
+            url = uri("https://maven.pkg.github.com/crashbandicootfm/mediator")
+            credentials {
+                username = "crashbandicootfm"
+                password = "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"
             }
         }
     }
 }
 
 rootProject.name = 'messenger'
+
+include 'messenger-client', 'messenger-server:messenger-server', 'messenger-server:messenger-server-api'
 
 [
         'messenger-client',

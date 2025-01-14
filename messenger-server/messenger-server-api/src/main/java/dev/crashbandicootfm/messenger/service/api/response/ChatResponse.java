@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatResponse {
 
@@ -21,8 +20,13 @@ public class ChatResponse {
 
   @NotNull Date createdAt;
 
-  @NotNull Long createdBy;
+  Long createdBy;
 
-  @NotNull List<Long> userIds;
+  List<Long> userIds;
 
+  public ChatResponse(Long id, String name, Date createdAt) {
+    this.id = id;
+    this.name = name;
+    this.createdAt = createdAt;
+  }
 }

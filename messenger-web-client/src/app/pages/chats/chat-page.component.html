@@ -1,0 +1,64 @@
+<div class="chat-container" [class.dark]="darkMode">
+  <aside class="chat-sidebar">
+    <div class="profile-section">
+      <div class="profile-avatar">
+        <i class="fa fa-user"></i>
+      </div>
+
+      <ul class="profile-menu">
+        <li>
+          <button class="menu-button" (click)="viewProfile()">View Profile</button>
+        </li>
+        <li>
+          <button class="menu-button" (click)="openSettings()">Settings</button>
+        </li>
+        <li>
+          <button class="menu-button" (click)="toggleTheme()">
+            {{ darkMode ? 'Light theme' : 'Dark theme' }}
+          </button>
+        </li>
+        <li>
+          <button class="menu-button" (click)="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="chat-content">
+    <header class="chat-header">
+      <h1>Chat</h1>
+    </header>
+
+    <div class="chat-messages">
+      <div *ngFor="let message of messages" class="message">
+        <strong>{{ message.user }}:</strong> {{ message.text }}
+        {{ logMessage(message) }}
+      </div>
+    </div>
+
+    <footer class="chat-footer">
+      <input
+        [(ngModel)]="newMessage"
+        type="text"
+        placeholder="Type your message..."
+        class="chat-input"
+      />
+      <div class="ephemeral-options">
+        <label>
+          <input type="checkbox" [(ngModel)]="isEphemeral" />
+          Send as ephemeral message
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="ephemeralDuration"
+          placeholder="Duration (ms)"
+          [disabled]="!isEphemeral"
+          min="1000"
+          step="1000"
+          class="ephemeral-duration-input"
+        />
+      </div>
+      <button (click)="sendMessage()" class="send-button">Send</button>
+    </footer>
+  </div>
+</div>

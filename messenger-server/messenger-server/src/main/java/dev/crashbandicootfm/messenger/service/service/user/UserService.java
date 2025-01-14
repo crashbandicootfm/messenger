@@ -2,9 +2,11 @@ package dev.crashbandicootfm.messenger.service.service.user;
 
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.UserModel;
+import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -23,4 +25,8 @@ public interface UserService {
   @NotNull UserModel getByUsername(@NotNull String username) throws UserException;
 
   @NotNull UserModel registerUser(@NotNull UserModel user);
+
+  @NotNull UserModel uploadAvatar(@NotNull Long userId, @NotNull MultipartFile file) throws UserException, IOException;
+
+  byte[] getUserAvatar(Long userId);
 }

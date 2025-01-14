@@ -2,6 +2,7 @@ package dev.crashbandicootfm.messenger.service.service.message;
 
 import dev.crashbandicootfm.messenger.service.model.MessageModel;
 import dev.crashbandicootfm.messenger.service.repository.MessageRepository;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,5 +26,10 @@ public class MessageServiceImpl implements MessageService {
   @Override
   public @NotNull MessageModel save(@NotNull MessageModel messageModel) {
     return messageRepository.save(messageModel);
+  }
+
+  @Override
+  public @NotNull List<MessageModel> getMessagesByChatId(@NotNull Long chatId) {
+    return messageRepository.findAllByChatId(chatId);
   }
 }

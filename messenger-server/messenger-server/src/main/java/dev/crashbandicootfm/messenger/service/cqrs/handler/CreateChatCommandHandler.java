@@ -1,5 +1,6 @@
 package dev.crashbandicootfm.messenger.service.cqrs.handler;
 
+import dev.crashbandicootfm.mediator.model.CommandHandler;
 import dev.crashbandicootfm.messenger.service.cqrs.command.CreateChatCommand;
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.ChatModel;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import pw.qubique.mediatr.command.CommandHandler;
 
 import java.util.Date;
 
