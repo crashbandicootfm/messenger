@@ -75,21 +75,14 @@ export class MessengerPageComponent {
     const chatName = prompt('Enter the chat name: ');
 
     if (chatName && chatName.trim()) {
-      const token = localStorage.getItem('token');
-
-      console.log('Creating chat with the following details:');
-      console.log('Chat Name:', chatName.trim());
-      console.log('Token:', token);
-
       this.chatService.createChat(chatName.trim()).subscribe({
         next: (response) => {
           console.log('Chat created successfully:', response);
           this.chatId = response.id;
-          alert(`Chat "${chatName.trim()}" created successfully!`);
-          this.router.navigate([`/chats/${this.chatId}`]);
+          this.router.navigate([`/chats/${this.chatId}/${chatName.trim()}`]);
         },
         error: (err) => {
-          console.error('Error creating chat', err);
+          console.error('Error creating chat:', err);
         }
       });
     } else {

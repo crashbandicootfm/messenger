@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'messenger', component: MessengerPageComponent, canActivate: [AuthGuard] },
-  { path: 'chats/:id', component: ChatPageComponent },
+  { path: 'chats/:id/:chatName', component: ChatPageComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];
 

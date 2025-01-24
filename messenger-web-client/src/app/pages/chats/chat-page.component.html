@@ -1,64 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messenger</title>
+  <link rel="stylesheet" href="chat-page.component.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body [class.dark]="darkMode">
 <div class="chat-container" [class.dark]="darkMode">
-  <aside class="chat-sidebar">
-    <div class="profile-section">
-      <div class="profile-avatar">
+  <!-- Боковая панель -->
+  <aside class="chat-sidebar" [class.dark]="darkMode">
+    <div class="profile-section" [class.dark]="darkMode">
+      <div class="profile-avatar" [class.dark]="darkMode" (click)="toggleProfileMenu()">
         <i class="fa fa-user"></i>
       </div>
 
-      <ul class="profile-menu">
+      <ul class="profile-menu" [class.dark]="darkMode" [class.open]="isProfileMenuOpen">
         <li>
-          <button class="menu-button" (click)="viewProfile()">View Profile</button>
-        </li>
-        <li>
-          <button class="menu-button" (click)="openSettings()">Settings</button>
-        </li>
-        <li>
-          <button class="menu-button" (click)="toggleTheme()">
+          <button class="menu-button" [class.dark]="darkMode" (click)="toggleTheme()">
+            <i class="fas fa-moon"></i>
             {{ darkMode ? 'Light theme' : 'Dark theme' }}
           </button>
         </li>
         <li>
-          <button class="menu-button" (click)="logout()">Logout</button>
+          <button class="menu-button" (click)="back()">
+            <i class="fas fa-home"></i> Home
+          </button>
         </li>
       </ul>
     </div>
   </aside>
 
-  <div class="chat-content">
+  <!-- Основная часть чата -->
+  <div class="chat-content" [class.dark]="darkMode">
     <header class="chat-header">
-      <h1>Chat</h1>
+      <h1 class="chat-title">{{ chatName }}</h1>
     </header>
 
-    <div class="chat-messages">
+    <!-- Сообщения чата -->
+    <div class="chat-messages" [class.dark]="darkMode">
       <div *ngFor="let message of messages" class="message">
         <strong>{{ message.user }}:</strong> {{ message.text }}
-        {{ logMessage(message) }}
       </div>
     </div>
 
-    <footer class="chat-footer">
-      <input
-        [(ngModel)]="newMessage"
-        type="text"
-        placeholder="Type your message..."
-        class="chat-input"
-      />
-      <div class="ephemeral-options">
-        <label>
-          <input type="checkbox" [(ngModel)]="isEphemeral" />
-          Send as ephemeral message
-        </label>
+    <!-- Футер с вводом сообщения -->
+    <footer class="chat-footer" [class.dark]="darkMode">
+      <div class="chat-input-container">
         <input
-          type="number"
-          [(ngModel)]="ephemeralDuration"
-          placeholder="Duration (ms)"
-          [disabled]="!isEphemeral"
-          min="1000"
-          step="1000"
-          class="ephemeral-duration-input"
+          [(ngModel)]="newMessage"
+          type="text"
+          placeholder="Write a message..."
+          class="chat-input"
         />
+
+        <!-- Кнопка отправки исчезающего сообщения -->
+        <button
+          (click)="sendMessage()"
+          (contextmenu)="openMessageTimerMenu($event)"
+          class="send-button"
+        >
+          <img
+            [src]="darkMode ? 'https://img.icons8.com/material-rounded/50/FFFFFF/sent.png' : 'https://cdn-icons-png.flaticon.com/128/736/736212.png'"
+            alt="Send Icon"
+            class="send-icon"
+          />
+        </button>
+
+        <!-- Кнопка отправки сообщения с задержкой -->
+        <button (click)="toggleSendLaterMenu()" class="send-later-button">
+          <i class="fas fa-calendar-days"></i>
+        </button>
       </div>
-      <button (click)="sendMessage()" class="send-button">Send</button>
+
+      <!-- Меню таймера для исчезающего сообщения -->
+      <div
+        *ngIf="isMessageTimerMenuOpen"
+        class="message-timer-menu"
+        [style.left]="'50%'"
+        [style.top]="'50%'"
+        [style.transform]="'translate(-50%, -50%)'"
+      >
+        <label>
+          Delete this message in...
+          <input type="number" [(ngModel)]="ephemeralDurationInput" placeholder="Seconds" min="1" />
+        </label>
+        <div class="button-group">
+          <button (click)="confirmMessageTimer()">Confirm</button>
+          <button (click)="closeMessageTimerMenu()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Меню для отправки с задержкой -->
+      <div
+        *ngIf="isSendLaterMenuOpen"
+        class="send-later-menu"
+        [style.left]="'50%'"
+        [style.top]="'50%'"
+        [style.transform]="'translate(-50%, -50%)'"
+      >
+        <label>
+          Send this message on...
+          <input type="datetime-local" [(ngModel)]="sendLaterDateTime" class="datetime-picker" />
+        </label>
+        <div class="button-group">
+          <button (click)="scheduleSendMessage()">Confirm</button>
+          <button (click)="closeSendLaterMenu()">Cancel</button>
+        </div>
+      </div>
     </footer>
   </div>
 </div>
+</body>
+</html>
