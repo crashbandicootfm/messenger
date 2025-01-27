@@ -23,4 +23,14 @@ export class MessageService {
 
     return this.http.post<MessageResponse>(this.url, messageRequest, { headers });
   }
+
+  getMessagesByChatId(chatId: number): Observable<MessageResponse[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http.get<MessageResponse[]>(`${this.url}chat/${chatId}`, { headers });
+  }
 }

@@ -91,7 +91,7 @@ export class MessengerPageComponent {
   }
 
   joinChat(): void {
-    const chatName = prompt('Enter the chat name you want to join: ');
+    const chatName = prompt('Enter the chat name:');
 
     if (chatName && chatName.trim()) {
       console.log('Attempting to join chat:', chatName.trim());
@@ -101,12 +101,13 @@ export class MessengerPageComponent {
           console.log('Successfully joined chat:', response);
           this.chatId = response.id;
           alert(`Successfully joined chat "${chatName.trim()}"!`);
-          this.router.navigate([`/chats/${this.chatId}`]); // Переход в чат
+          this.router.navigate([`/chats/${this.chatId}/${chatName.trim()}`]);
         },
         error: (err) => {
           console.error('Error joining chat:', err);
-          alert(`Failed to join chat "${chatName.trim()}". Please try again.`);
-        }
+          const errorMessage = err.error?.message || 'Unknown error occurred';
+          alert(`Failed to join chat "${chatName.trim()}". ${errorMessage}`);
+        },
       });
     } else {
       alert('Please enter a valid chat name.');

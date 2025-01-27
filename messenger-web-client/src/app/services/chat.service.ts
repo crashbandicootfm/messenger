@@ -29,6 +29,7 @@ export class ChatService {
 
   joinChat(name: string): Observable<ChatResponse> {
     const token = localStorage.getItem('token');
+    console.log("Token from service:", token);
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -37,9 +38,5 @@ export class ChatService {
     const payload = { name };
 
     return this.http.post<ChatResponse>(`${this.url}join`, payload, { headers });
-  }
-
-  sendMessage(message: { user: string; text: string }): Observable<any> {
-    return this.http.post(`${this.url}/messages`, message);
   }
 }

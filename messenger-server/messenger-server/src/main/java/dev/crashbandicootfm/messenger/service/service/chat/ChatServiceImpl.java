@@ -10,10 +10,13 @@ import dev.crashbandicootfm.messenger.service.service.user.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChatServiceImpl implements ChatService {
@@ -45,6 +48,8 @@ public class ChatServiceImpl implements ChatService {
         .orElseThrow(() -> new ChatException("Chat not found!"));
 
     UserModel user = userService.getById(userId);
+    System.out.println("AAAAAAAAAAAAAAAAAA");
+    System.out.println("User: " + user.getId());
     if (user == null) {
       throw new UserException("User not found!");
     }
@@ -53,13 +58,25 @@ public class ChatServiceImpl implements ChatService {
       throw new ChatException("User is already in the chat!");
     }
 
-    chat.getUserIds().add(userId);
+    System.out.println("AAAAAAAAAA");
 
-    user.getChatIds().add(chat.getId());
+    try {
+      chat.getUserIds().add(userId);
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Failed");
+    }
+    try {
+      user.getChatIds().add(chat.getId());
+
 
     chatRepository.save(chat);
     userRepository.save(user);
-
+    System.out.println("Saved: " + user.getId());
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Failed 1");
+    }
     return chat;
   }
 }

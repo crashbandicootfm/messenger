@@ -11,6 +11,7 @@ import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.ChatModel;
 import dev.crashbandicootfm.messenger.service.service.chat.ChatService;
 import dev.crashbandicootfm.messenger.service.service.security.details.UserDetailsImpl;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -55,7 +56,7 @@ public class ChatController {
   }
 
   @PostMapping(value = "/join", produces = "application/json", consumes = "application/json")
-  public ResponseEntity<ChatResponse> joinChat(
+  public ResponseEntity<?> joinChat(
       @RequestBody JoinChatRequest request,
       @AuthenticationPrincipal UserDetailsImpl principal
   ) {
@@ -71,9 +72,15 @@ public class ChatController {
       response.setUserIds(chat.getUserIds());
 
       return ResponseEntity.ok(response);
-    } catch (ChatException | UserException e) {
+    } catch (ChatException e) {
+      log.error("Error joining chat: {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-          new ChatResponse(null, e.getMessage(), null)
+          Map.of("message", e.getMessage())
+      );
+    } catch (Exception e) {
+      log.error("Unexpected error joining chat: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          Map.of("message", "An unexpected error occurred. Please try again.")
       );
     }
   }

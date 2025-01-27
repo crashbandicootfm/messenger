@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,16 +99,17 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/upload-avatar/{userId}")
-    public ResponseEntity<?> uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        try {
-            String token = request.getHeader("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid");
-            }
-
-            String username = jwtService.extractUsername(token);
+    public ResponseEntity<?> uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file)
+        throws IOException {
+//        try {
+//            String token = request.getHeader("Authorization");
+//            if (token != null && token.startsWith("Bearer ")) {
+//                token = token.substring(7);
+//            } else {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization token is missing or invalid");
+//            }
+//
+            String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
 
             UserModel user = userService.getByUsername(username);
             if (!user.getId().equals(userId)) {
@@ -118,8 +121,8 @@ public class UserController {
             UserResponse response = new UserResponse(updatedUser.getId(), updatedUser.getUsername());
             return ResponseEntity.ok(response);
 
-        } catch (UserException | IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+//        } catch (UserException | IOException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
     }
 }

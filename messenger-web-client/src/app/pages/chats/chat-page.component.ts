@@ -5,6 +5,8 @@ import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {Router} from '@angular/router';
 import {MessageRequest} from '../../models/request/message-request.model';
 import {ActivatedRoute} from '@angular/router';
+import { Subscription, interval } from 'rxjs'
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-chats-page',
@@ -14,7 +16,11 @@ import {ActivatedRoute} from '@angular/router';
   standalone: true,
 })
 export class ChatPageComponent implements OnInit {
-  messages: { user: string; text: string; isEphemeral?: boolean; timerId?: any }[] = [];
+  messages: {
+    id: string;
+    user: string; text: string; isEphemeral?: boolean; timerId?: any
+  } [] = [];
+
   isProfileMenuOpen: boolean = false;
   newMessage: string = '';
   chatId: number | null = null;
@@ -27,6 +33,7 @@ export class ChatPageComponent implements OnInit {
   isMessageTimerMenuOpen: boolean = false;
   ephemeralDurationInput: number = 5;
   chatName: string | null = null;
+  private pollingSubscription!: Subscription;
 
   constructor(
     private router: Router,
@@ -43,9 +50,15 @@ export class ChatPageComponent implements OnInit {
       this.router.navigate(['/messenger']);
     } else {
       console.log(`Chat ID: ${this.chatId}, Chat Name: ${this.chatName}`);
+      this.startPollingMessages();
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
+  }
 
   scrollToBottom(): void {
     setTimeout(() => {
@@ -92,6 +105,7 @@ export class ChatPageComponent implements OnInit {
           console.log('Message sent successfully:', response);
 
           const newMsg = {
+            id: uuidv4(), // Генерация уникального ID для сообщения
             user: 'You',
             text: response.message,
             isEphemeral: this.isEphemeral,
@@ -100,7 +114,7 @@ export class ChatPageComponent implements OnInit {
           this.messages.push(newMsg);
 
           if (this.isEphemeral && this.ephemeralDuration > 0) {
-            this.scheduleMessageRemoval(newMsg);
+            this.scheduleMessageRemoval(newMsg.id); // Передача ID сообщения
           }
 
           this.newMessage = '';
@@ -141,12 +155,13 @@ export class ChatPageComponent implements OnInit {
                 user: 'You',
                 text: response.message,
                 isEphemeral: this.isEphemeral,
+                id: '',
               };
 
               this.messages.push(newMsg);
 
               if (this.isEphemeral) {
-                this.scheduleMessageRemoval(newMsg);
+                this.scheduleMessageRemoval(newMsg.id);
               }
 
               this.scrollToBottom();
@@ -167,11 +182,41 @@ export class ChatPageComponent implements OnInit {
     }
   }
 
-  scheduleMessageRemoval(message: { user: string; text: string; isEphemeral?: boolean; timerId?: any }): void {
-    message.timerId = setTimeout(() => {
-      this.messages = this.messages.filter((msg) => msg !== message);
-      console.log('Ephemeral message removed:', message.text);
+  scheduleMessageRemoval(messageId: string): void {
+    setTimeout(() => {
+      this.messages = this.messages.filter((msg) => msg.id !== messageId);
+      console.log('Ephemeral message removed:', messageId);
     }, this.ephemeralDuration);
+  }
+
+  startPollingMessages(): void {
+    this.pollingSubscription = interval(1000).subscribe(() => {
+      this.fetchMessages();
+    });
+  }
+
+  fetchMessages(): void {
+    if (this.chatId) {
+      this.messageService.getMessagesByChatId(this.chatId).subscribe({
+        next: (serverMessages) => {
+          // Проверяем новые сообщения и добавляем только те, которых ещё нет
+          serverMessages.forEach((serverMsg) => {
+            if (!this.messages.some((msg) => msg.text === serverMsg.message)) {
+              this.messages.push({
+                id: uuidv4(), // Присваиваем новый ID
+                user: serverMsg.createdBy.toString(),
+                text: serverMsg.message,
+                isEphemeral: false,
+              });
+            }
+          });
+          this.scrollToBottom();
+        },
+        error: (err) => {
+          console.error('Error fetching messages:', err);
+        },
+      });
+    }
   }
 
   toggleProfileMenu(): void {

@@ -33,12 +33,13 @@ public class ChatModel {
 
   @Column(name = "created_by", updatable = false, nullable = false)
   Long createdBy;
-  
-  @ElementCollection
+
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(
-      name = "users_chats",
+      name = "chats_users",
       joinColumns = @JoinColumn(name = "user_id")
   )
+//  @Column(name = "chat_id")
   List<Long> userIds = new ArrayList<>();
 
 }

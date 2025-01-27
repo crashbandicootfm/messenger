@@ -27,11 +27,12 @@ public class UserModel {
   @Column(name = "password", nullable = false, updatable = false)
   String password;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(
       name = "users_chats",
       joinColumns = @JoinColumn(name = "chat_id")
   )
+//  @Column(name = "user_id")
   List<Long> chatIds = new ArrayList<>();
 
   @Column(name = "profile_image")
