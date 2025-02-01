@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MessageService} from '../../services/message.service';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
@@ -6,21 +6,18 @@ import {Router} from '@angular/router';
 import {MessageRequest} from '../../models/request/message-request.model';
 import {ActivatedRoute} from '@angular/router';
 import { Subscription, interval } from 'rxjs'
-import { v4 as uuidv4 } from 'uuid';
+import { NgZone } from '@angular/core';
+import {Message} from '../../models/response/message.model';
 
 @Component({
   selector: 'app-chats-page',
   templateUrl: 'chat-page.component.html',
   styleUrls: ['chat-page.component.css'],
-  imports: [FormsModule, NgForOf, NgClass, NgIf],
+  imports: [FormsModule, NgForOf, NgIf],
   standalone: true,
 })
 export class ChatPageComponent implements OnInit {
-  messages: {
-    id: string;
-    user: string; text: string; isEphemeral?: boolean; timerId?: any
-  } [] = [];
-
+  messages: Message[] = [];
   isProfileMenuOpen: boolean = false;
   newMessage: string = '';
   chatId: number | null = null;
@@ -28,22 +25,30 @@ export class ChatPageComponent implements OnInit {
   isEphemeral: boolean = false;
   ephemeralDuration: number = 5000;
   isSendLaterMenuOpen: boolean = false;
+  isEphemeralMenuOpen: boolean = false;
   sendLaterDateTime: string = '';
   menuPosition = { x: 0, y: 0 };
-  isMessageTimerMenuOpen: boolean = false;
   ephemeralDurationInput: number = 5;
   chatName: string | null = null;
   private pollingSubscription!: Subscription;
+  username: string | null = null;
+  avatarUrl: string | null = null;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
     this.chatId = Number(this.route.snapshot.paramMap.get('id'));
     this.chatName = this.route.snapshot.paramMap.get('chatName');
+
+    this.route.queryParams.subscribe(params => {
+      this.username = params['username'];
+      this.avatarUrl = params['avatarUrl'];
+    });
 
     if (!this.chatId || !this.chatName) {
       alert('Invalid Chat ID or Chat Name');
@@ -58,6 +63,12 @@ export class ChatPageComponent implements OnInit {
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
     }
+
+    this.messages.forEach((msg) => {
+      if (msg.timerId) {
+        clearTimeout(msg.timerId);
+      }
+    });
   }
 
   scrollToBottom(): void {
@@ -69,29 +80,53 @@ export class ChatPageComponent implements OnInit {
     }, 0);
   }
 
-  openMessageTimerMenu(event: MouseEvent): void {
+  // openMessageTimerMenu(event: MouseEvent): void {
+  //   event.preventDefault();
+  //   this.isMessageTimerMenuOpen = true;
+  //   const button = document.querySelector('.send-button');
+  //   if (button) {
+  //     const rect = button.getBoundingClientRect();
+  //     this.menuPosition = { x: rect.left, y: rect.bottom + 10 };
+  //   }
+  // }
+
+  // closeMessageTimerMenu(): void {
+  //   this.isMessageTimerMenuOpen = false;
+  // }
+
+  // confirmMessageTimer(): void {
+  //   if (this.ephemeralDurationInput > 0) {
+  //     this.ephemeralDuration = this.ephemeralDurationInput * 1000;
+  //     alert(`Messages will auto-delete after ${this.ephemeralDurationInput} seconds.`);
+  //   } else {
+  //     alert('Invalid timer value. Please enter a positive number.');
+  //   }
+  //   this.closeMessageTimerMenu();
+  // }
+
+  openEphemeralMenu(event: MouseEvent): void {
     event.preventDefault();
-    this.isMessageTimerMenuOpen = true;
-    const button = document.querySelector('.send-button');
-    if (button) {
-      const rect = button.getBoundingClientRect();
-      this.menuPosition = { x: rect.left, y: rect.bottom + 10 };
-    }
+    this.isEphemeralMenuOpen = true;
+    const button = event.target as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    this.menuPosition = { x: rect.left, y: rect.bottom + 10 };
   }
 
-  closeMessageTimerMenu(): void {
-    this.isMessageTimerMenuOpen = false;
+  closeEphemeralMenu(): void {
+    this.isEphemeralMenuOpen = false;
   }
 
-  confirmMessageTimer(): void {
+  confirmEphemeralDuration(): void {
     if (this.ephemeralDurationInput > 0) {
       this.ephemeralDuration = this.ephemeralDurationInput * 1000;
       alert(`Messages will auto-delete after ${this.ephemeralDurationInput} seconds.`);
     } else {
       alert('Invalid timer value. Please enter a positive number.');
     }
-    this.closeMessageTimerMenu();
+    this.isEphemeral = true;
+    this.closeEphemeralMenu();
   }
+
 
   sendMessage(): void {
     if (this.newMessage.trim() && this.chatId) {
@@ -104,19 +139,19 @@ export class ChatPageComponent implements OnInit {
         next: (response) => {
           console.log('Message sent successfully:', response);
 
-          const newMsg = {
-            id: uuidv4(), // Генерация уникального ID для сообщения
+          const newMsg: Message = {
+            id: response.id,
             user: 'You',
             text: response.message,
             isEphemeral: this.isEphemeral,
+            isRemoved: false,
           };
 
-          this.messages.push(newMsg);
-
-          if (this.isEphemeral && this.ephemeralDuration > 0) {
-            this.scheduleMessageRemoval(newMsg.id); // Передача ID сообщения
+          if (this.isEphemeral) {
+            this.scheduleMessageRemoval(newMsg);
           }
 
+          this.messages.push(newMsg);
           this.newMessage = '';
           this.scrollToBottom();
         },
@@ -151,18 +186,18 @@ export class ChatPageComponent implements OnInit {
             next: (response) => {
               console.log('Scheduled message sent successfully:', response);
 
-              const newMsg = {
+              const newMsg: Message = {
+                id: response.id,
                 user: 'You',
                 text: response.message,
                 isEphemeral: this.isEphemeral,
-                id: '',
               };
 
               this.messages.push(newMsg);
 
-              if (this.isEphemeral) {
-                this.scheduleMessageRemoval(newMsg.id);
-              }
+              // if (this.isEphemeral) {
+              //   this.scheduleMessageRemoval(newMsg);
+              // }
 
               this.scrollToBottom();
             },
@@ -182,10 +217,23 @@ export class ChatPageComponent implements OnInit {
     }
   }
 
-  scheduleMessageRemoval(messageId: string): void {
-    setTimeout(() => {
-      this.messages = this.messages.filter((msg) => msg.id !== messageId);
-      console.log('Ephemeral message removed:', messageId);
+  scheduleMessageRemoval(message: Message): void {
+    message.timerId = setTimeout(() => {
+      this.ngZone.run(() => {
+        message.isRemoved = true;
+
+        this.messageService.deleteMessage(message.id).subscribe({
+          next: () => {
+            console.log('Message removed from server:', message.text);
+
+            this.messages = this.messages.filter((msg) => msg.id !== message.id);
+            this.isEphemeral = false;
+          },
+          error: (err) => {
+            console.error('Error removing message from server:', err);
+          },
+        });
+      });
     }, this.ephemeralDuration);
   }
 
@@ -198,18 +246,18 @@ export class ChatPageComponent implements OnInit {
   fetchMessages(): void {
     if (this.chatId) {
       this.messageService.getMessagesByChatId(this.chatId).subscribe({
-        next: (serverMessages) => {
-          // Проверяем новые сообщения и добавляем только те, которых ещё нет
-          serverMessages.forEach((serverMsg) => {
-            if (!this.messages.some((msg) => msg.text === serverMsg.message)) {
-              this.messages.push({
-                id: uuidv4(), // Присваиваем новый ID
-                user: serverMsg.createdBy.toString(),
-                text: serverMsg.message,
-                isEphemeral: false,
-              });
-            }
-          });
+        next: (messages) => {
+          const deletedIds = new Set(this.messages.filter((msg) => msg.isRemoved).map((msg) => msg.id));
+
+          this.messages = messages
+            .filter((msg) => !deletedIds.has(msg.id))
+            .map((msg) => ({
+              id: msg.id,
+              user: msg.createdBy.toString(),
+              text: msg.message,
+              isEphemeral: false,
+            }));
+
           this.scrollToBottom();
         },
         error: (err) => {
@@ -218,6 +266,7 @@ export class ChatPageComponent implements OnInit {
       });
     }
   }
+
 
   toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;

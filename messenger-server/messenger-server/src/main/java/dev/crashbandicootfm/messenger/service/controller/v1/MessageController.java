@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,13 @@ public class MessageController {
                 message.getCreatedBy(),
                 message.getChatId()
             )).collect(Collectors.toList());
+    }
+
+    @DeleteMapping("/mess/{messageId}")
+    public void deleteChatMessages(@PathVariable Long messageId) {
+        System.out.println("AAAAAAAAAAAA");
+        messageService.deleteMessageById(messageId);
+        System.out.println("Deleted message: " + messageId);
     }
 
 //    @GetMapping("/chat/{chatId}")

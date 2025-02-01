@@ -32,4 +32,11 @@ public class MessageServiceImpl implements MessageService {
   public @NotNull List<MessageModel> getMessagesByChatId(@NotNull Long chatId) {
     return messageRepository.findAllByChatId(chatId);
   }
+
+  @Override
+  public void deleteMessageById(@NotNull Long id) {
+    System.out.println("Attempting to delete message with ID: " + id);
+    messageRepository.deleteById(id);
+    System.out.println("Message deleted: " + id);
+  }
 }

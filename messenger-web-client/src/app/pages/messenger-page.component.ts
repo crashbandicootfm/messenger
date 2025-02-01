@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgClass, NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
@@ -10,10 +10,10 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
   selector: 'app-messenger-page',
   templateUrl: './messenger-page.component.html',
   styleUrls: ['./messenger-page.component.css'],
-  imports: [NgIf, FormsModule, NgClass],
-  standalone: true
+  standalone: true,
+  imports: [NgIf, FormsModule, NgClass]
 })
-export class MessengerPageComponent {
+export class MessengerPageComponent implements OnInit {
   showProfileMenu: boolean = false;
   darkMode: boolean = false;
   chatId: number | null = null;
@@ -79,7 +79,12 @@ export class MessengerPageComponent {
         next: (response) => {
           console.log('Chat created successfully:', response);
           this.chatId = response.id;
-          this.router.navigate([`/chats/${this.chatId}/${chatName.trim()}`]);
+          this.router.navigate([`/chats/${this.chatId}/${chatName.trim()}`], {
+            queryParams: {
+              username: this.username,
+              avatarUrl: this.avatarUrl
+            }
+          });
         },
         error: (err) => {
           console.error('Error creating chat:', err);
@@ -101,7 +106,12 @@ export class MessengerPageComponent {
           console.log('Successfully joined chat:', response);
           this.chatId = response.id;
           alert(`Successfully joined chat "${chatName.trim()}"!`);
-          this.router.navigate([`/chats/${this.chatId}/${chatName.trim()}`]);
+          this.router.navigate([`/chats/${this.chatId}/${chatName.trim()}`], {
+            queryParams: {
+              username: this.username,
+              avatarUrl: this.avatarUrl
+            }
+          });
         },
         error: (err) => {
           console.error('Error joining chat:', err);

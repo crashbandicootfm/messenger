@@ -13,4 +13,6 @@ public interface MessageService {
   @NotNull MessageModel save(@NotNull MessageModel messageModel);
 
   @NotNull List<MessageModel> getMessagesByChatId(@NotNull Long chatId);
+
+  void deleteMessageById(@NotNull Long id);
 }

@@ -33,4 +33,14 @@ export class MessageService {
 
     return this.http.get<MessageResponse[]>(`${this.url}chat/${chatId}`, { headers });
   }
+
+  deleteMessage(messageId: number): Observable<void> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+
+    return this.http.delete<void>(`${this.url}mess/${messageId}`, { headers });
+  }
 }

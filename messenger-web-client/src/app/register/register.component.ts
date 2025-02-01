@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
   standalone: true,
   imports: [
     ReactiveFormsModule
-  ],
+  ]
 })
 export class RegisterComponent {
   registerForm: FormGroup;

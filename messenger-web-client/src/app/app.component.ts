@@ -5,9 +5,9 @@ import {RegisterComponent} from './register/register.component';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, RegisterComponent, LoginComponent],
+  imports: [RouterOutlet],
   template: '<router-outlet></router-outlet>',
+  standalone: true,
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {

@@ -40,8 +40,11 @@
 
     <!-- Сообщения чата -->
     <div class="chat-messages" [class.dark]="darkMode">
+      <img *ngIf="avatarUrl" [src]="avatarUrl" alt="User Avatar" class="avatar">
+      <span *ngIf="username" class="username">{{ username }}</span>
       <div *ngFor="let message of messages" class="message">
-        <strong>{{ message.user }}:</strong> {{ message.text }}
+        <span class="user">{{ message.user }}</span>
+        <span class="text">{{ message.text }}</span>
       </div>
     </div>
 
@@ -58,7 +61,7 @@
         <!-- Кнопка отправки исчезающего сообщения -->
         <button
           (click)="sendMessage()"
-          (contextmenu)="openMessageTimerMenu($event)"
+          (contextmenu)="openEphemeralMenu($event)"
           class="send-button"
         >
           <img
@@ -76,19 +79,23 @@
 
       <!-- Меню таймера для исчезающего сообщения -->
       <div
-        *ngIf="isMessageTimerMenuOpen"
-        class="message-timer-menu"
+        *ngIf="isEphemeralMenuOpen"
+        class="send-later-menu"
         [style.left]="'50%'"
         [style.top]="'50%'"
         [style.transform]="'translate(-50%, -50%)'"
       >
         <label>
           Delete this message in...
-          <input type="number" [(ngModel)]="ephemeralDurationInput" placeholder="Seconds" min="1" />
+          <input
+            type="number"
+            [(ngModel)]="ephemeralDurationInput"
+            min="1"
+          />
         </label>
         <div class="button-group">
-          <button (click)="confirmMessageTimer()">Confirm</button>
-          <button (click)="closeMessageTimerMenu()">Cancel</button>
+          <button (click)="confirmEphemeralDuration()">Confirm</button>
+          <button (click)="closeEphemeralMenu()">Cancel</button>
         </div>
       </div>
 
