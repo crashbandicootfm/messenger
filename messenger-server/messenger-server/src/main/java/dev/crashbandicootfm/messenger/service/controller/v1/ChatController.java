@@ -3,14 +3,20 @@ package dev.crashbandicootfm.messenger.service.controller.v1;
 import com.github.dozermapper.core.Mapper;
 import dev.crashbandicootfm.mediator.Mediatr;
 import dev.crashbandicootfm.messenger.service.api.request.CreateChatRequest;
+import dev.crashbandicootfm.messenger.service.api.request.CreateChatWithPasswordRequest;
 import dev.crashbandicootfm.messenger.service.api.request.JoinChatRequest;
 import dev.crashbandicootfm.messenger.service.api.response.ChatResponse;
 import dev.crashbandicootfm.messenger.service.cqrs.command.CreateChatCommand;
+import dev.crashbandicootfm.messenger.service.cqrs.command.CreateChatWithPasswordCommand;
 import dev.crashbandicootfm.messenger.service.exception.user.ChatException;
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.ChatModel;
+import dev.crashbandicootfm.messenger.service.model.MessageModel;
+import dev.crashbandicootfm.messenger.service.repository.MessageRepository;
 import dev.crashbandicootfm.messenger.service.service.chat.ChatService;
+import dev.crashbandicootfm.messenger.service.service.message.MessageService;
 import dev.crashbandicootfm.messenger.service.service.security.details.UserDetailsImpl;
+import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +50,10 @@ public class ChatController {
   @NotNull Mediatr mediatr;
 
   @NotNull ChatService chatService;
+
+  @NotNull MessageService messageService;
+
+  @NotNull MessageRepository messageRepository;
 
   @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
   public ChatResponse create(
@@ -85,10 +97,143 @@ public class ChatController {
     }
   }
 
+  @PostMapping(value = "/createWithPassword", produces = "application/json", consumes = "application/json")
+  public ChatResponse createChatWithPassword(
+      @RequestBody CreateChatWithPasswordRequest request,
+      @AuthenticationPrincipal UserDetailsImpl principal) {
+    CreateChatWithPasswordCommand command = new CreateChatWithPasswordCommand(principal.getId(), request.getName(), request.getPassword());
+    ChatModel model = mediatr.dispatch(command, ChatModel.class);
+    return mapper.map(model, ChatResponse.class);
+  }
+
+  @PostMapping(value = "/join-with-password", produces = "application/json", consumes = "application/json")
+  public ResponseEntity<?> joinChatWithPassword(
+      @RequestBody JoinChatRequest request,
+      @RequestParam String password,
+      @AuthenticationPrincipal UserDetailsImpl principal
+  ) {
+    try {
+      ChatModel chat = chatService.joinChatWithPassword(request.getName(), principal.getId(), password);
+
+      ChatResponse response = new ChatResponse(
+          chat.getId(),
+          chat.getName(),
+          chat.getCreatedAt()
+      );
+      response.setUserIds(chat.getUserIds());
+
+      return ResponseEntity.ok(response);
+    } catch (ChatException e) {
+      log.error("Error joining chat: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+          Map.of("message", e.getMessage())
+      );
+    } catch (Exception e) {
+      log.error("Unexpected error joining chat: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+          Map.of("message", "An unexpected error occurred. Please try again.")
+      );
+    }
+  }
+
   @GetMapping("/find")
   public ResponseEntity<ChatResponse> findByName(@RequestParam String name) {
     ChatModel chat = chatService.findByChatName(name);
     ChatResponse response = new ChatResponse(chat.getId(), chat.getName(), chat.getCreatedAt());
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/user/chats")
+  public ResponseEntity<List<ChatResponse>> findUserChats(@AuthenticationPrincipal UserDetailsImpl principal) {
+    List<ChatModel> chats = chatService.findAllByUserId(principal.getId());
+
+    List<ChatResponse> responses = chats.stream()
+        .map(chat -> {
+          String lastMessage = messageService.findLastMessageByChatId(chat.getId());
+          String lastMessageSender = messageService.findLastMessageSenderByChatId(chat.getId());
+          Long unreadCount = chatService.getUnreadMessagesCount(chat.getId(), principal.getId());
+
+          return new ChatResponse(
+              chat.getId(),
+              chat.getName(),
+              chat.getCreatedAt(),
+              lastMessage,
+              lastMessageSender,
+              unreadCount
+          );
+        })
+        .toList();
+
+    return ResponseEntity.ok(responses);
+  }
+
+  @PostMapping(value = "/start-private", produces = "application/json")
+  public ResponseEntity<?> startPrivateChat(
+      @RequestParam Long otherUserId,
+      @AuthenticationPrincipal UserDetailsImpl principal
+  ) {
+    try {
+      ChatModel chat = chatService.startPrivateChat(principal.getId(), otherUserId);
+      ChatResponse response = new ChatResponse(chat.getId(), chat.getName(), chat.getCreatedAt());
+      response.setUserIds(chat.getUserIds());
+      return ResponseEntity.ok(response);
+    } catch (ChatException | UserException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error creating chat"));
+    }
+  }
+
+  @DeleteMapping("/{chatId}")
+  public ResponseEntity<?> deleteChat(
+      @PathVariable Long chatId,
+      @AuthenticationPrincipal UserDetailsImpl principal
+  ) {
+    try {
+      chatService.deleteChat(chatId, principal.getId());
+      return ResponseEntity.ok(Map.of("message", "Chat deleted successfully"));
+    } catch (ChatException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error deleting chat"));
+    }
+  }
+
+  @PostMapping("/leave")
+  public ResponseEntity<?> leaveChat(
+      @RequestParam Long chatId,
+      @AuthenticationPrincipal UserDetailsImpl principal
+  ) {
+    try {
+      chatService.leaveChat(chatId, principal.getId());
+      return ResponseEntity.ok(Map.of("message", "Successfully left the chat"));
+    } catch (ChatException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error leaving chat"));
+    }
+  }
+
+  @GetMapping("/{chatId}/messages")
+  public ResponseEntity<List<MessageModel>> getMessagesByChatId(@PathVariable Long chatId) {
+    List<MessageModel> messages = messageService.getMessagesByChatId(chatId);
+
+    if (messages.isEmpty()) {
+      return ResponseEntity.noContent().build();
+    }
+
+    return ResponseEntity.ok(messages);
+  }
+
+  @GetMapping("/unread-count")
+  public ResponseEntity<Long> getUnreadMessagesCount(@RequestParam Long chatId, @RequestParam Long userId) {
+    return ResponseEntity.ok(chatService.getUnreadMessagesCount(chatId, userId));
+  }
+
+  @PostMapping("/{chatId}/mark-as-read")
+  public ResponseEntity<Void> markChatAsRead(@PathVariable Long chatId, @RequestBody Map<String, Long> request) {
+    Long userId = request.get("userId");
+    chatService.markChatAsRead(chatId, userId, messageRepository.getLastMessageId(chatId));
+    return ResponseEntity.ok().build();
   }
 }

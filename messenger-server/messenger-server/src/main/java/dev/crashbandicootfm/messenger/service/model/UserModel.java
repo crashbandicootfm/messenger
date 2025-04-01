@@ -38,4 +38,21 @@ public class UserModel {
   @Column(name = "profile_image")
   @Lob
   byte[] profileImage;
+
+  @Column(name = "email", unique = true)
+  String email;
+
+  @Builder.Default
+  @Column(name = "is_two_factor_enable", nullable = false)
+  Boolean isTwoFactorEnable = false;
+
+  String secretKey;
+
+  public void setTwoFactorEnable(boolean b) {
+    isTwoFactorEnable = b;
+  }
+
+  public boolean isTwoFactorEnable() {
+    return Boolean.TRUE.equals(isTwoFactorEnable);
+  }
 }

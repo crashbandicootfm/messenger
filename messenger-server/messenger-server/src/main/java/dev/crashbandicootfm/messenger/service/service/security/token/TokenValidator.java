@@ -5,4 +5,6 @@ import org.jetbrains.annotations.NotNull;
 public interface TokenValidator {
 
     boolean isValid(@NotNull String token);
+
+    boolean isRefreshTokenValid(@NotNull String token);
 }

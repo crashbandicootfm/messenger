@@ -8,6 +8,9 @@ import {ActivatedRoute} from '@angular/router';
 import { Subscription, interval } from 'rxjs'
 import { NgZone } from '@angular/core';
 import {Message} from '../../models/response/message.model';
+import {AuthenticationService} from '../../services/authentication.service';
+import {ChatService} from '../../services/chat.service';
+import {ChatResponse} from '../../models/response/chat-response.model';
 
 @Component({
   selector: 'app-chats-page',
@@ -19,6 +22,7 @@ import {Message} from '../../models/response/message.model';
 export class ChatPageComponent implements OnInit {
   messages: Message[] = [];
   isProfileMenuOpen: boolean = false;
+  currentUserId: number | null = null;
   newMessage: string = '';
   chatId: number | null = null;
   darkMode: boolean = false;
@@ -33,12 +37,21 @@ export class ChatPageComponent implements OnInit {
   private pollingSubscription!: Subscription;
   username: string | null = null;
   avatarUrl: string | null = null;
+  searchQuery: string = '';
+  searchActive = false;
+  userChats: ChatResponse[] = [];
+  selectedChat: ChatResponse | null = null;
+  showConfirmation = false;
+  chatToLeave: number | null = null;
+  file: File | null = null;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
+    private authService: AuthenticationService,
     private route: ActivatedRoute,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private chatService: ChatService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +70,15 @@ export class ChatPageComponent implements OnInit {
       console.log(`Chat ID: ${this.chatId}, Chat Name: ${this.chatName}`);
       this.startPollingMessages();
     }
+
+    // this.authService.getUserProfile().subscribe({
+    //   next: (user) => {
+    //     this.currentUserId = user.id;
+    //     this.username = user.username;
+    //     this.avatarUrl = user.avatarUrl;
+    //     console.log('User profile loaded:', user);
+    //   }
+    // });
   }
 
   ngOnDestroy(): void {
@@ -69,6 +91,24 @@ export class ChatPageComponent implements OnInit {
         clearTimeout(msg.timerId);
       }
     });
+  }
+
+  get filteredMessages(): Message[] {
+    if (!this.searchQuery) {
+      return this.messages;
+    }
+    return this.messages.filter(message =>
+      message.text.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
+  toggleSearch() {
+    this.searchActive = !this.searchActive;
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchActive = false;
   }
 
   scrollToBottom(): void {
@@ -127,7 +167,6 @@ export class ChatPageComponent implements OnInit {
     this.closeEphemeralMenu();
   }
 
-
   sendMessage(): void {
     if (this.newMessage.trim() && this.chatId) {
       const messageRequest: MessageRequest = {
@@ -139,12 +178,16 @@ export class ChatPageComponent implements OnInit {
         next: (response) => {
           console.log('Message sent successfully:', response);
 
+          const messageSentSound = new Audio('http://localhost:8080/assets/sound.mp3'); // Path to your sound file
+          messageSentSound.play();
+
           const newMsg: Message = {
             id: response.id,
-            user: 'You',
+            user: this.username || 'You',
             text: response.message,
             isEphemeral: this.isEphemeral,
             isRemoved: false,
+            userId: this.currentUserId ?? undefined,
           };
 
           if (this.isEphemeral) {
@@ -243,22 +286,81 @@ export class ChatPageComponent implements OnInit {
     });
   }
 
+  confirmLeaveChat() {
+    if (!this.selectedChat && !this.chatId) {
+      return;
+    }
+
+    this.chatToLeave = this.selectedChat ? this.selectedChat.id : this.chatId;
+
+    if (this.chatToLeave === null) {
+      console.error("Ошибка: ID чата не может быть null");
+      return;
+    }
+
+    this.showConfirmation = true;
+  }
+
+  cancelLeaveChat() {
+    this.showConfirmation = false;
+    this.chatToLeave = null;
+  }
+
+  leaveSelectedChat() {
+    if (this.chatToLeave === null) {
+      return;
+    }
+
+    this.chatService.leaveChat(this.chatToLeave).subscribe({
+      next: () => {
+        this.userChats = this.userChats.filter(c => c.id !== this.chatToLeave);
+
+        this.chatService.getUserChats().subscribe((chats) => {
+          this.userChats = chats;
+        });
+
+        if (this.chatId === this.chatToLeave) {
+          this.router.navigate(['/messenger']);
+        }
+
+        this.selectedChat = null;
+        this.showConfirmation = false;
+      },
+      error: (err) => {
+        console.error('Ошибка при выходе из чата:', err);
+      }
+    });
+  }
+
+  selectChat(chat: ChatResponse) {
+    this.selectedChat = chat;
+  }
+
   fetchMessages(): void {
     if (this.chatId) {
       this.messageService.getMessagesByChatId(this.chatId).subscribe({
         next: (messages) => {
           const deletedIds = new Set(this.messages.filter((msg) => msg.isRemoved).map((msg) => msg.id));
 
-          this.messages = messages
-            .filter((msg) => !deletedIds.has(msg.id))
-            .map((msg) => ({
-              id: msg.id,
-              user: msg.createdBy.toString(),
-              text: msg.message,
-              isEphemeral: false,
-            }));
+          const newMessages = messages.filter((msg) => !deletedIds.has(msg.id));
+          const isNewMessage = newMessages.length > this.messages.length;
 
-          this.scrollToBottom();
+          this.messages = newMessages.map((msg) => ({
+            id: msg.id,
+            user: msg.username,
+            text: msg.message,
+            isEphemeral: false,
+            sentAt: new Date(msg.sentAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+            sentDate: new Date(msg.sentAt).toLocaleDateString('ru-RU'),
+            isRemoved: false,
+            fileUrl: msg.fileUrl,
+            userId: msg.createdBy,
+          }));
+
+          if (isNewMessage) {
+            const newMessageSound = new Audio('http://localhost:8080/assets/sound1.mp3');
+            newMessageSound.play();
+          }
         },
         error: (err) => {
           console.error('Error fetching messages:', err);
@@ -266,7 +368,6 @@ export class ChatPageComponent implements OnInit {
       });
     }
   }
-
 
   toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
@@ -283,7 +384,6 @@ export class ChatPageComponent implements OnInit {
       }
     }
   }
-
 
   toggleTheme(): void {
     this.darkMode = !this.darkMode;

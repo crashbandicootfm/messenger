@@ -28,6 +28,10 @@ public class JwtService implements ClaimService, TokenFactory, TokenValidator {
     @Value("${jwt.lifetime}")
     int lifetime;
 
+    @NonFinal
+    @Value("${jwt.refresh-lifetime}")
+    int refreshLifetime;
+
     @Override
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
@@ -57,10 +61,31 @@ public class JwtService implements ClaimService, TokenFactory, TokenValidator {
     }
 
     @Override
+    public @NotNull String generateRefreshToken(@NotNull String username) {
+        return Jwts.builder()
+            .subject(username)
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + refreshLifetime))
+            .signWith(getSignKey())
+            .compact();
+    }
+
+    @Override
     public boolean isValid(@NotNull String token) {
         try {
             Claims claims = extractClaims(token);
 
+            boolean expired = claims.getExpiration().before(new Date(System.currentTimeMillis()));
+            return !expired;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isRefreshTokenValid(@NotNull String token) {
+        try {
+            Claims claims = extractClaims(token);
             boolean expired = claims.getExpiration().before(new Date(System.currentTimeMillis()));
             return !expired;
         } catch (JwtException e) {

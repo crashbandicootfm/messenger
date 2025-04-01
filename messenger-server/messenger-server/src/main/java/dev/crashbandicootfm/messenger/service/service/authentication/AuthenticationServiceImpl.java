@@ -2,8 +2,10 @@ package dev.crashbandicootfm.messenger.service.service.authentication;
 
 import dev.crashbandicootfm.messenger.service.api.request.AuthenticationRequest;
 import dev.crashbandicootfm.messenger.service.api.request.RegistrationRequest;
+import dev.crashbandicootfm.messenger.service.api.response.TokenResponse;
 import dev.crashbandicootfm.messenger.service.exception.user.UserAlreadyRegisteredException;
 import dev.crashbandicootfm.messenger.service.model.UserModel;
+import dev.crashbandicootfm.messenger.service.service.security.token.TokenFactory;
 import dev.crashbandicootfm.messenger.service.service.user.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +30,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @NotNull PasswordEncoder passwordEncoder;
 
-    @Override
-    public void authenticate(@NotNull AuthenticationRequest authenticationRequest) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(),
-                authenticationRequest.getPassword());
+    @NotNull TokenFactory tokenFactory;
 
+//    public void authenticate(@NotNull AuthenticationRequest authenticationRequest) {
+//        Authentication authentication = new UsernamePasswordAuthenticationToken(
+//            authenticationRequest.getUsername(),
+//            authenticationRequest.getPassword());
+//
+//        authenticationManager.authenticate(authentication);
+//    }
+
+
+    @Override
+    public TokenResponse authenticate(@NotNull AuthenticationRequest authenticationRequest) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            authenticationRequest.getUsername(),
+            authenticationRequest.getPassword()
+        );
         authenticationManager.authenticate(authentication);
+
+        UserModel user = userService.getByUsername(authenticationRequest.getUsername());
+
+        String token = tokenFactory.generateToken(user.getUsername());
+
+        String refreshToken = tokenFactory.generateRefreshToken(user.getUsername());
+
+        if (Boolean.TRUE.equals(user.isTwoFactorEnable())) {
+            return new TokenResponse(token, refreshToken, true);
+        }
+
+        return new TokenResponse(token, refreshToken, false);
     }
 
     @Override

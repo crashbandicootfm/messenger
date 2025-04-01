@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import {Observable, tap} from 'rxjs';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {catchError, map, Observable, of, tap, throwError} from 'rxjs';
 import { AuthenticationRequest } from '../models/request/authentication-request.model';
 import { RegistrationRequest } from '../models/request/registration-request.model';
 import { TokenResponse } from '../models/response/token-response.model';
 import { UserResponse } from '../models/response/user-response.model';
+import nacl from 'tweetnacl';
+import util from 'tweetnacl-util';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +14,7 @@ import { UserResponse } from '../models/response/user-response.model';
 export class AuthenticationService {
   private readonly apiUrl = "http://localhost:8080/api/v1/authentication";
   private readonly userUrl = "http://localhost:8080/api/v1/users/";
+  private twoFactorRequired = false;
 
   constructor(private http: HttpClient) {}
 
@@ -28,24 +31,66 @@ export class AuthenticationService {
     );
   }
 
+
   register(regRequest: RegistrationRequest): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(`${this.apiUrl}/register`, regRequest);
   }
 
-  getUserProfile(): Observable<{ id: number, username: string, avatarUrl: string }> {
+  refreshToken(): Observable<TokenResponse> {
+    const refreshToken = localStorage.getItem('refreshToken');
+    return this.http.post<TokenResponse>(`${this.apiUrl}/refresh`, { refreshToken });
+  }
+
+  getUserProfile(): Observable<{ id: number, username: string, avatarUrl?: string }> {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    return this.http.get<{ id: number, username: string, avatarUrl: string }>(`${this.userUrl}profile`, { headers });
+    return this.http.get<{ id: number, username: string, avatarUrl?: string }>(
+      `${this.userUrl}profile`,
+      { headers }
+    ).pipe(
+      tap(profile => {
+        if (!profile.avatarUrl) {
+          profile.avatarUrl = 'http://localhost:8080/assets/avatar.png';
+        }
+      })
+    );
   }
 
   getAvatar(userId: number): Observable<Blob> {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    return this.http.get<Blob>(`${this.userUrl}avatar/${userId}`, { headers, responseType: 'blob' as 'json' });
+    return this.http.get(`${this.userUrl}avatar/${userId}`, {
+      headers,
+      responseType: 'blob'
+    }).pipe(
+      tap(blob => {
+        if (blob.size === 0) {
+          console.warn("Получен пустой аватар!");
+        }
+      }),
+      catchError(err => {
+        console.error("Ошибка загрузки аватара", err);
+        return of(new Blob());
+      })
+    );
   }
 
+  searchUsersByName(username: string): Observable<UserResponse[]> {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return this.http.get<UserResponse[]>(`${this.userUrl}search?username=${username}`, { headers });
+  }
+
+  generateKeyPair(): { publicKey: string; privateKey: string } {
+    const keyPair = nacl.box.keyPair();
+    return {
+      publicKey: util.encodeBase64(keyPair.publicKey),
+      privateKey: util.encodeBase64(keyPair.secretKey),
+    };
+  }
 
   getUserById(id: number): Observable<UserResponse> {
     const token = localStorage.getItem('token');
@@ -60,4 +105,68 @@ export class AuthenticationService {
 
     return this.http.get<UserResponse>(`${this.userUrl}/username/${username}`, { headers });
   }
+
+  enableTwoFactorAuth(): Observable<string> {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return this.http.post<{ qrCodeUrl?: string; error?: string }>(
+      `${this.userUrl}enable-2fa`, {}, { headers }
+    ).pipe(
+      map(response => {
+        if (response.qrCodeUrl) {
+          console.log("QR-код для 2FA:", response.qrCodeUrl);
+          return response.qrCodeUrl;
+        } else {
+          console.error("Ошибка сервера:", response.error);
+          return '';
+        }
+      }),
+      catchError(err => {
+        console.error("Ошибка при включении 2FA", err);
+        return of('');
+      })
+    );
+  }
+
+  verifyTwoFactorCode(code: number): Observable<TokenResponse> {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return this.http.post<TokenResponse>(
+      `${this.userUrl}verify-2fa`,
+      { code },
+      { headers }
+    ).pipe(
+      tap(response => {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }),
+      catchError(err => {
+        console.log("Token: " + token);
+        console.error("Ошибка верификации 2FA", err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  updateEmail(email: string): Observable<UserResponse> {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return this.http.post<UserResponse>(
+      `${this.userUrl}update-email`,
+      { email },
+      { headers }
+    ).pipe(
+      tap(response => {
+        console.log("Email успешно обновлён", response);
+      }),
+      catchError(err => {
+        console.error("Ошибка при обновлении email", err);
+        return throwError(() => err);
+      })
+    );
+  }
+
 }

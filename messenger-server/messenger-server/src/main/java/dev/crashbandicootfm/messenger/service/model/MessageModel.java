@@ -1,6 +1,7 @@
 package dev.crashbandicootfm.messenger.service.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -34,4 +35,18 @@ public class MessageModel {
 
   @Column(name = "message", updatable = false, nullable = false)
   String message;
+
+  @ElementCollection
+  @CollectionTable(name = "message_readers", joinColumns = @JoinColumn(name = "message_id"))
+  @Column(name = "user_id")
+  List<Long> readByUsers;
+
+  @Column(name = "file_url")
+  String fileUrl;
+
+  public void markAsRead(Long userId) {
+    if (!readByUsers.contains(userId)) {
+      readByUsers.add(userId);
+    }
+  }
 }

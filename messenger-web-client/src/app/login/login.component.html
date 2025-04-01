@@ -1,6 +1,6 @@
 <div class="login-container">
   <h2>Login</h2>
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <form *ngIf="!twoFactorRequired" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <label for="username">Username:</label>
     <input id="username" formControlName="username" type="text" placeholder="Enter your username" />
 
@@ -10,8 +10,17 @@
     <button type="submit" [disabled]="!loginForm.valid">Login</button>
   </form>
 
+  <div *ngIf="twoFactorRequired" class="two-factor-container">
+    <h3>Enter 2FA Code</h3>
+    <form [formGroup]="twoFactorForm" (ngSubmit)="onSubmitTwoFactor()">
+      <label for="twoFactorCode">2FA Code:</label>
+      <input id="twoFactorCode" formControlName="twoFactorCode" type="text" placeholder="Enter 2FA code" />
+      <button type="submit">Verify 2FA</button>
+    </form>
+  </div>
+
   <div class="register-link">
-    <p>Dont have account?</p>
+    <p>Don't have an account?</p>
     <button class="register-button" (click)="goToRegister()">Register</button>
   </div>
 </div>

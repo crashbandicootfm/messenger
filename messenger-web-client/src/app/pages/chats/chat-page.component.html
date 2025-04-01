@@ -30,32 +30,93 @@
         </li>
       </ul>
     </div>
+
+    <div class="leave-chat-section">
+      <button class="leave-chat-button" (click)="confirmLeaveChat()">
+        <i class="fas fa-sign-out-alt"></i> Leave Chat
+      </button>
+    </div>
+
+    <!-- Модальное окно подтверждения -->
+    <div class="modal-overlay" *ngIf="showConfirmation">
+      <div class="modal">
+        <p>Are you sure you want to leave this chat?</p>
+        <div class="modal-actions">
+          <button (click)="leaveSelectedChat()">Yes</button>
+          <button (click)="cancelLeaveChat()">No</button>
+        </div>
+      </div>
+    </div>
   </aside>
 
   <!-- Основная часть чата -->
   <div class="chat-content" [class.dark]="darkMode">
-    <header class="chat-header">
+    <header class="chat-header" [class.dark]="darkMode">
       <h1 class="chat-title">{{ chatName }}</h1>
+      <div class="search-container">
+        <button class="search-icon" (click)="toggleSearch()">
+          <i class="fas fa-search"></i>
+        </button>
+        <div class="search-box" [class.dark]="darkMode" *ngIf="searchActive">
+          <input
+            [(ngModel)]="searchQuery"
+            type="text"
+            placeholder="Search messages..."
+            class="search-input" [class.dark]="darkMode"
+          />
+          <button class="search-button" (click)="clearSearch()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
     </header>
+
+    <div *ngFor="let chat of userChats" (click)="selectChat(chat)" [class.selected]="chat === selectedChat">
+      {{ chat.name }}
+    </div>
 
     <!-- Сообщения чата -->
     <div class="chat-messages" [class.dark]="darkMode">
-      <img *ngIf="avatarUrl" [src]="avatarUrl" alt="User Avatar" class="avatar">
-      <span *ngIf="username" class="username">{{ username }}</span>
-      <div *ngFor="let message of messages" class="message">
-        <span class="user">{{ message.user }}</span>
-        <span class="text">{{ message.text }}</span>
-      </div>
+      <ng-container *ngFor="let message of filteredMessages; let i = index">
+        <!-- Разделитель даты -->
+        <div *ngIf="i === 0 || message.sentDate !== filteredMessages[i - 1].sentDate" class="date-separator" [class.dark]="darkMode">
+          {{ message.sentDate }}
+        </div>
+
+        <!-- Контейнер сообщения -->
+        <div class="message-container" [class.own-message]="message.id === currentUserId">
+          <!-- Имя пользователя над сообщением -->
+          <div class="user-info">
+            <span *ngIf="message.user" class="username">{{ message.user }}</span>
+          </div>
+
+          <!-- Сообщение -->
+          <div class="message">
+            <span class="text">{{ message.text }}</span>
+            <span class="timestamp">{{ message.sentAt }}</span>
+          </div>
+
+          <div class="user-info">
+            <img *ngIf="message.avatarUrl" [src]="message.avatarUrl" alt="User Avatar" class="avatar">
+          </div>
+        </div>
+      </ng-container>
     </div>
 
     <!-- Футер с вводом сообщения -->
     <footer class="chat-footer" [class.dark]="darkMode">
       <div class="chat-input-container">
+
+<!--        <div>-->
+<!--          <input type="file" (change)="onFileChange($event)" />-->
+<!--          <button (click)="uploadFile()">Upload File</button>-->
+<!--        </div>-->
+
         <input
           [(ngModel)]="newMessage"
           type="text"
           placeholder="Write a message..."
-          class="chat-input"
+          class="chat-input" [class.dark]="darkMode"
         />
 
         <!-- Кнопка отправки исчезающего сообщения -->

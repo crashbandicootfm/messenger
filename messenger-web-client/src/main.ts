@@ -10,6 +10,7 @@ import {AppComponent} from './app/app.component';
 import {MessengerPageComponent} from './app/pages/messenger-page.component';
 import {AuthGuard} from './app/auth/authguard';
 import {ChatPageComponent} from './app/pages/chats/chat-page.component';
+import {TokenInterceptor} from './app/token/token-interceptor';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,5 +26,6 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     importProvidersFrom(ReactiveFormsModule),
+    // { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
   ],
 }).catch(err => console.error(err));

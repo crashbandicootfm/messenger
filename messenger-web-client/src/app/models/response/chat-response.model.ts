@@ -4,4 +4,7 @@ export interface ChatResponse {
   createdAt: string;
   createdBy?: string;
   userIds: number[];
+  lastMessage?: string;
+  lastMessageSender?: string;
+  unreadCount: number;
 }

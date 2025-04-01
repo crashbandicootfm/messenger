@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "chats")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @SuppressWarnings("JpaDataSourceORMInspection")
 public class ChatModel {
 
@@ -34,12 +34,16 @@ public class ChatModel {
   @Column(name = "created_by", updatable = false, nullable = false)
   Long createdBy;
 
+  @Column(name = "password")
+  String password;
+
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(
       name = "chats_users",
       joinColumns = @JoinColumn(name = "user_id")
   )
-//  @Column(name = "chat_id")
   List<Long> userIds = new ArrayList<>();
 
+  @Column(name = "unread_count")
+  Long unreadCount;
 }

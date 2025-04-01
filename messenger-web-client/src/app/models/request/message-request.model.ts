@@ -1,4 +1,5 @@
 export interface MessageRequest {
     message: string;
-    chatId: number;
+    chatId: number | null;
+    fileUrl?: string;
 }

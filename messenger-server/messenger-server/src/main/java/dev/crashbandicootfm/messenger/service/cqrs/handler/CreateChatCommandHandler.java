@@ -28,11 +28,11 @@ public class CreateChatCommandHandler implements CommandHandler<CreateChatComman
     if (!userService.existsById(command.getUserId())) {
       throw new UserException("User %s not found!".formatted(command.getUserId()));
     }
-    ChatModel chatModel = ChatModel.builder()
-        .createdAt(new Date())
-        .createdBy(command.getUserId())
-        .name(command.getChatName())
-        .build();
-    return chatService.save(chatModel);
+//    ChatModel chatModel = ChatModel.builder()
+//        .createdAt(new Date())
+//        .createdBy(command.getUserId())
+//        .name(command.getChatName())
+//        .build();
+    return chatService.createChat(command.getChatName(), command.getUserId());
   }
 }

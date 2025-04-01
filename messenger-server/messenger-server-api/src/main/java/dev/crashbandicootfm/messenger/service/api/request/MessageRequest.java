@@ -14,4 +14,13 @@ public class MessageRequest {
     @NotNull String message;
 
     @NotNull Long chatId;
+
+    String fileUrl;
+
+
+    public MessageRequest(@NotNull String message, @NotNull Long chatId, String fileUrl) {
+        this.message = message;
+        this.chatId = chatId;
+        this.fileUrl = fileUrl;
+    }
 }

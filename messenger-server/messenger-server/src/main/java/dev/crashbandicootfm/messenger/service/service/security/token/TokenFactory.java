@@ -5,4 +5,6 @@ import org.jetbrains.annotations.NotNull;
 public interface TokenFactory {
 
     @NotNull String generateToken(@NotNull String username);
+
+    @NotNull String generateRefreshToken(@NotNull String username);
 }

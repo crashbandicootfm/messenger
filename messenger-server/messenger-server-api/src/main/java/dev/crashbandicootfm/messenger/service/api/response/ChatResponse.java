@@ -24,9 +24,25 @@ public class ChatResponse {
 
   List<Long> userIds;
 
+  String lastMessage;
+
+  String lastMessageSender;
+
+  Long unreadCount;
+
   public ChatResponse(Long id, String name, Date createdAt) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;
   }
+
+  public ChatResponse(Long id, String name, Date createdAt, String lastMessage, String lastMessageSender, Long unreadCount) {
+    this.id = id;
+    this.name = name;
+    this.createdAt = createdAt;
+    this.lastMessage = lastMessage;
+    this.lastMessageSender = lastMessageSender;
+    this.unreadCount = unreadCount;
+  }
+
 }

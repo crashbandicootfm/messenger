@@ -1,6 +1,7 @@
 package dev.crashbandicootfm.messenger.service.configuration;
 
 import dev.crashbandicootfm.messenger.service.service.security.filter.JwtAuthenticationFilter;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
@@ -60,7 +60,8 @@ public class SecurityConfiguration {
           .csrf(AbstractHttpConfigurer::disable)
           .cors(httpSecurityCorsConfigurer -> {
             CorsConfiguration configuration = new CorsConfiguration();
-            configuration.addAllowedOrigin("http://localhost:4200"); // Specify frontend domain, e.g. Angular
+            configuration.addAllowedOrigin("http://localhost:4200");
+            configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));// Specify frontend domain, e.g. Angular
             configuration.addAllowedMethod("*"); // Allow all HTTP methods (GET, POST, PUT, etc.)
             configuration.addAllowedHeader("*"); // Allow all headers
             configuration.setAllowCredentials(true); // Allow cookies and credentials like Authorization headers
@@ -71,7 +72,7 @@ public class SecurityConfiguration {
             httpSecurityCorsConfigurer.configurationSource(source);
           })
           .authorizeHttpRequests(registry -> registry
-              .requestMatchers("/api/v1/authentication/**")
+              .requestMatchers("/api/v1/authentication/**",  "/assets/**", "/uploads/**")
               .permitAll()
               .anyRequest().authenticated())
           .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

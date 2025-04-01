@@ -13,4 +13,23 @@ import org.jetbrains.annotations.NotNull;
 public class TokenResponse {
 
     @NotNull String token;
+
+    @NotNull String refreshToken;
+
+    boolean twoFactorRequired;
+
+    Long id;
+
+    public TokenResponse(@NotNull String token, @NotNull String refreshToken, boolean twoFactorRequired) {
+        this.token = token;
+        this.refreshToken = refreshToken;
+        this.twoFactorRequired = twoFactorRequired;
+    }
+
+    public TokenResponse(@NotNull String token, @NotNull String refreshToken, boolean twoFactorRequired, Long id) {
+        this.token = token;
+        this.refreshToken = refreshToken;
+        this.twoFactorRequired = twoFactorRequired;
+        this.id = id;
+    }
 }

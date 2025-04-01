@@ -42,44 +42,234 @@
             <p><strong>Hi, </strong> {{ username }}</p>
 
             <div class="avatar-section">
-              <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar" class="avatar">
-              <p *ngIf="!avatarUrl">No avatar uploaded</p>
+              <img [src]="avatarUrl || '/assets/avatar.png'" class="avatar">
             </div>
 
             <button class="menu-button" (click)="backToMainMenu()">Back</button>
             <button class="menu-button" (click)="changeAvatar()">Change Avatar</button>
 
             <div *ngIf="isChangingAvatar">
-              <input type="file" (change)="onFileSelected($event)" accept="image/*">
+              <div class="file-input-wrapper">
+                <input type="file" (change)="onFileSelected($event)" accept="image/*">
+                <button class="file-input-button">Choose File</button>
+              </div>
               <button (click)="uploadAvatar()">Upload</button>
             </div>
           </div>
         </ng-template>
       </div>
     </div>
+
+    <div *ngIf="showTwoFactorAuth" class="two-factor-modal" [class.dark]="darkMode">
+      <div class="modal-content" [class.dark]="darkMode">
+        <button class="close-btn" (click)="closeModal()">×</button>
+
+        <h2>Security Settings</h2>
+
+        <button class="btn-add-email" [class.dark]="darkMode" (click)="addEmail()">Add Email</button>
+
+        <div *ngIf="!qrCodeUrl">
+          <p>Enable two-factor authentication by scanning the QR code:</p>
+          <button class="btn-enable-2fa" [class.dark]="darkMode" (click)="enableTwoFactorAuth()">Enable 2FA</button>
+          <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </div>
+
+        <div *ngIf="qrCodeUrl">
+          <p>Scan the QR code to enable two-factor authentication:</p>
+          <img [src]="qrCodeUrl" alt="QR code for 2FA" class="qr-code" [class.dark]="darkMode">
+        </div>
+
+        <div class="instructions" [class.dark]="darkMode">
+          <h3>How to Set Up Two-Factor Authentication:</h3>
+          <ol>
+            <li><strong>Add your email:</strong> Make sure you have a valid email added to your account.</li>
+            <li><strong>Install Google Authenticator:</strong> Download and install the Google Authenticator app on your phone.</li>
+            <li><strong>Scan the QR code:</strong> Open the Google Authenticator app and scan the displayed QR code to complete the setup.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="showEmailModal" class="email-modal">
+      <div class="modal-content">
+        <button class="close-btn" (click)="closeEmailModal()">×</button>
+
+        <!-- Email input field with placeholder -->
+        <input
+          [(ngModel)]="newEmail"
+          type="email"
+          id="emailInput"
+          placeholder="Enter Your Email"
+          class="email-input"
+          (focus)="onInputFocus()"
+          (blur)="onInputBlur()">
+
+        <!-- Error message for invalid email -->
+        <div *ngIf="newEmail && !validateEmail(newEmail)" class="error-message">
+          Please enter a valid email address.
+        </div>
+
+        <button class="btn-save-email" (click)="saveEmail()">Save Email</button>
+      </div>
+    </div>
+
     <div class="header-actions">
       <h1 class="app-title">Messenger</h1>
     </div>
   </header>
 
-  <main class="main-content">
-    <div class="welcome-card">
-      <h2>Welcome to Messenger</h2>
-      <p>Start chatting with your friends or join a chat room to connect with others.</p>
+  <div class="container">
+    <aside class="sidebar" [class.dark]="darkMode">
+      <h3>Chats</h3>
+      <ul class="chat-list" #chatList [class.dark]="darkMode">
+        <li *ngFor="let chat of userChats"
+            (click)="openChat(chat)"
+            (contextmenu)="onRightClick($event, chat)"
+            [ngClass]="{'highlight-new-message': chat.unreadCount > 0}">
+          <div class="chat-item" [class.dark]="darkMode">
+            <span class="chat-name" [class.dark]="darkMode">{{ chat.name || "No chat name" }}</span>
+            <span class="chat-last-message" [class.dark]="darkMode">
+          <span class="message-sender">{{ chat.lastMessageSender }}:</span>
+          <span class="message-text">{{ chat.lastMessage || "No messages yet" }}</span>
+        </span>
+          </div>
+        </li>
+      </ul>
+    </aside>
+
+    <div *ngIf="contextMenuVisible"
+         class="context-menu"
+         [style.top.px]="contextMenuY"
+         [style.left.px]="contextMenuX">
+      <button (click)="deleteChat(selectedChat)">Delete</button>
     </div>
 
-    <div class="action-buttons">
-      <button class="action-button" (click)="createChat()">Create Chat</button>
-      <button class="action-button" (click)="joinChat()">Join Chat</button>
-    </div>
+    <main class="main-content">
+      <div class="welcome-card">
+        <h2>Welcome to Messenger</h2>
+        <p>Start chatting with your friends or join a chat room to connect with others.</p>
+      </div>
 
-    <div *ngIf="showProfile" class="profile-info">
-      <h3>Profile Information</h3>
-      <p><strong>Username:</strong> {{ username }}</p>
-      <button class="menu-button" (click)="changeAvatar()">Change Avatar</button>
-    </div>
-  </main>
+      <div class="search-container">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Search"
+          (input)="searchUsers()">
+
+        <button (click)="isSearching ? clearSearch() : searchUsers()">
+          <i class="fas" [ngClass]="{'fa-search': !isSearching, 'fa-times': isSearching}"></i>
+        </button>
+      </div>
+
+      <ul *ngIf="searchResults.length" class="search-results">
+        <li *ngFor="let user of searchResults">
+          <span>{{ user.username }}</span>
+          <button (click)="startChatWithUser(user)">
+            <i class="fas fa-comment"></i>
+          </button>
+        </li>
+      </ul>
+
+      <div class="chat-menu-container" [class.dark]="darkMode">
+        <button class="chat-menu-button" (click)="toggleChatMenu()">
+          <i class="fas fa-comments"></i> Start Chatting
+        </button>
+
+        <div *ngIf="showCreateChatModal" class="chat-modal">
+          <div class="modal-content">
+            <button class="close-btn" (click)="closeChatModal()">×</button>
+            <h2>Create Chat</h2>
+            <input type="text" [(ngModel)]="newChatName" placeholder="Enter chat name" />
+            <button class="chat-modal-button" (click)="createChat()">Create Chat</button>
+          </div>
+        </div>
+
+        <div *ngIf="showJoinChatModal" class="chat-modal">
+          <div class="modal-content">
+            <button class="close-btn" (click)="closeChatModal()">×</button>
+            <h2>Join Chat</h2>
+            <input type="text" [(ngModel)]="newChatName" placeholder="Enter chat name" />
+            <button class="chat-modal-button" (click)="joinChat()">Join Chat</button>
+          </div>
+        </div>
+
+        <div *ngIf="showPasswordChatModal" class="chat-modal">
+          <div class="modal-content">
+            <button class="close-btn" (click)="closeChatModal()">×</button>
+
+            <h2>Create Chat with Password</h2>
+
+            <div *ngIf="modalStep === 1">
+              <input
+                type="text"
+                [(ngModel)]="newChatName"
+                placeholder="Enter chat name"
+                class="chat-modal-input"
+              />
+              <button class="chat-modal-button" (click)="nextStep()">Next</button>
+            </div>
+
+            <div *ngIf="modalStep === 2">
+              <input
+                type="password"
+                [(ngModel)]="newPassword"
+                placeholder="Enter chat password"
+                class="chat-modal-input"
+              />
+              <button class="chat-modal-button" (click)="createChatWithPasswordSubmit()">Create Chat</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showJoinPasswordChatModal" class="chat-modal">
+          <div class="modal-content">
+            <button class="close-btn" (click)="closeChatModal()">×</button>
+
+            <h2>Join Chat with Password</h2>
+
+            <div *ngIf="modalStep === 1">
+              <input
+                type="text"
+                [(ngModel)]="newChatName"
+                placeholder="Enter chat name"
+                class="chat-modal-input"
+              />
+              <button class="chat-modal-button" (click)="nextStep()">Next</button>
+            </div>
+
+            <div *ngIf="modalStep === 2">
+              <input
+                type="password"
+                [(ngModel)]="newPassword"
+                placeholder="Enter chat password"
+                class="chat-modal-input"
+              />
+              <button class="chat-modal-button" (click)="joinChatWithPasswordSubmit()">Join Chat</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showChatMenu"
+             class="action-buttons"
+             [class.dark]="darkMode"
+             [@fadeInScale]>
+          <button class="action-button" (click)="openChatModal()">
+            <i class="fas fa-plus"></i> Create Chat
+          </button>
+          <button class="action-button" (click)="openJoinChatModal()">
+            <i class="fas fa-sign-in-alt"></i> Join Chat
+          </button>
+          <button class="action-button" (click)="createChatWithPassword()">
+            <i class="fas fa-lock"></i> Create Chat with Password
+          </button>
+          <button class="action-button" (click)="joinChatWithPassword()">
+            <i class="fas fa-key"></i> Join Chat with Password
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
-
 </body>
 </html>

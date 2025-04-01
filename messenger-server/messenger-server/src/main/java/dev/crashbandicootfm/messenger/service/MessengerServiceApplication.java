@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "dev.crashbandicootfm.messenger.service.model")
 @EnableJpaRepositories(basePackages = "dev.crashbandicootfm.messenger.service.repository")
 public class MessengerServiceApplication {
-
+  
   public static void main(String @NotNull [] args) {
     SpringApplication.run(MessengerServiceApplication.class, args);
   }

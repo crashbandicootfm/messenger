@@ -4,18 +4,23 @@ import { AuthenticationService } from '../services/authentication.service';
 import { AuthenticationRequest } from '../models/request/authentication-request.model';
 import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
+import {TokenResponse} from '../models/response/token-response.model';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   imports: [
     ReactiveFormsModule,
+    NgIf,
   ],
   standalone: true,
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  twoFactorForm: FormGroup;
+  twoFactorRequired: boolean = false;
+  storedUsername: string = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,6 +31,10 @@ export class LoginComponent {
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+
+    this.twoFactorForm = this.formBuilder.group({
+      twoFactorCode: ['', [Validators.required, Validators.minLength(6)]]
+    });
   }
 
   onSubmit() {
@@ -33,21 +42,45 @@ export class LoginComponent {
       const authRequest: AuthenticationRequest = this.loginForm.value;
       this.authService.login(authRequest).subscribe({
         next: (response) => {
-          console.log('Token:', response.token);
-          localStorage.setItem('token', response.token);
-
-          this.router.navigate(['/messenger']);
+          if (response.twoFactorRequired) {
+            this.twoFactorRequired = true;
+            this.storedUsername = authRequest.username;
+          } else {
+            this.storeTokensAndRedirect(response);
+          }
         },
         error: (err) => {
           console.error('Login error:', err);
         }
       });
-    } else {
-      console.log("Form is invalid");
     }
   }
 
+  onSubmitTwoFactor() {
+    if (this.twoFactorForm.valid && this.storedUsername) {
+      const twoFactorCode = parseInt(this.twoFactorForm.value.twoFactorCode, 10);
+      if (isNaN(twoFactorCode)) {
+        console.error('Invalid twoFactorCode: not a number');
+        return;
+      }
+
+      console.log('Sending twoFactorCode:', twoFactorCode);
+
+      this.authService.verifyTwoFactorCode(twoFactorCode).subscribe({
+        next: (response) => this.storeTokensAndRedirect(response),
+        error: (err) => console.error('2FA verification failed', err)
+      });
+    }
+  }
+
+  storeTokensAndRedirect(response: TokenResponse) {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    this.router.navigate(['/messenger']);
+  }
+
   goToRegister() {
-    this.router.navigate(['/register'])
+    this.router.navigate(['/register']);
   }
 }
+

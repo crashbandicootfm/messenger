@@ -3,6 +3,7 @@ package dev.crashbandicootfm.messenger.service.service.user;
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.UserModel;
 import java.io.IOException;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -29,4 +30,16 @@ public interface UserService {
   @NotNull UserModel uploadAvatar(@NotNull Long userId, @NotNull MultipartFile file) throws UserException, IOException;
 
   byte[] getUserAvatar(Long userId);
+
+  @NotNull List<UserModel> searchUserByUserName(@NotNull String username);
+
+  void savePublicKey(@NotNull String username, @NotNull String publicKey) throws UserException;
+
+  @NotNull String getPublicKey(@NotNull String username);
+
+  @NotNull String enableTwoFactorAuth(@NotNull Long userId) throws UserException;
+
+  boolean verifyTwoFactorCode(@NotNull Long userId, int code) throws UserException;
+
+  @NotNull UserModel updateEmail(Long userId, String email) throws UserException;
 }

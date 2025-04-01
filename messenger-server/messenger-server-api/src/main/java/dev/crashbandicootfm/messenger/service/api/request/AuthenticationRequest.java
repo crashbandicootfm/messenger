@@ -14,4 +14,6 @@ public class AuthenticationRequest {
     @NotNull String username;
 
     @NotNull String password;
+
+    Integer twoFactorCode;
 }

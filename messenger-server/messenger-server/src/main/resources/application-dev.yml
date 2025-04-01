@@ -22,4 +22,5 @@ server:
 
 jwt:
   secret: ${secret}
-  lifetime: 180000
+  lifetime: 1800000
+  refresh-lifetime: 86400000
