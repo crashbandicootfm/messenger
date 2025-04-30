@@ -48,6 +48,9 @@ public class UserModel {
 
   String secretKey;
 
+  @Column(name = "public_key")
+  String publicKey;
+
   public void setTwoFactorEnable(boolean b) {
     isTwoFactorEnable = b;
   }

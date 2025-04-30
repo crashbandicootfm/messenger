@@ -1,5 +1,6 @@
 package dev.crashbandicootfm.messenger.service.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -17,10 +18,12 @@ public class MessageRequest {
 
     String fileUrl;
 
+    boolean isEncrypted;
 
-    public MessageRequest(@NotNull String message, @NotNull Long chatId, String fileUrl) {
-        this.message = message;
-        this.chatId = chatId;
-        this.fileUrl = fileUrl;
+    @JsonProperty(value = "isEncrypted")
+        public void setIsEncrypted(boolean isEncrypted) {
+        this.isEncrypted = isEncrypted;
     }
+
+    int recipientId;
 }

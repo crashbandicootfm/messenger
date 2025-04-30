@@ -1,5 +1,6 @@
 package dev.crashbandicootfm.messenger.service.api.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,15 @@ public class MessageResponse {
     String fileUrl;
 
     boolean isImage;
+
+    boolean isEncrypted;
+
+    int recipientId;
+
+    @JsonProperty(value = "isEncrypted")
+    public boolean isEncrypted() {
+        return isEncrypted;
+    }
 
     public MessageResponse(@NotNull Long id, @NotNull String message, Date sentAt, @NotNull Long createdBy, @NotNull Long chatId, @NotNull String username, boolean isRead, String fileUrl) {
         this.id = id;

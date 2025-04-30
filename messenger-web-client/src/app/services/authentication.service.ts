@@ -19,30 +19,29 @@ export class AuthenticationService {
   constructor(private http: HttpClient) {}
 
   isAuthenticated(): boolean {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return !!token;
   }
 
   login(authRequest: AuthenticationRequest): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(`${this.apiUrl}/login`, authRequest).pipe(
       tap((response: TokenResponse) => {
-        localStorage.setItem('token', response.token);
+        sessionStorage.setItem('token', response.token);
       })
     );
   }
-
 
   register(regRequest: RegistrationRequest): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(`${this.apiUrl}/register`, regRequest);
   }
 
   refreshToken(): Observable<TokenResponse> {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = sessionStorage.getItem('refreshToken');
     return this.http.post<TokenResponse>(`${this.apiUrl}/refresh`, { refreshToken });
   }
 
   getUserProfile(): Observable<{ id: number, username: string, avatarUrl?: string }> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.get<{ id: number, username: string, avatarUrl?: string }>(
@@ -58,7 +57,7 @@ export class AuthenticationService {
   }
 
   getAvatar(userId: number): Observable<Blob> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.get(`${this.userUrl}avatar/${userId}`, {
@@ -77,8 +76,8 @@ export class AuthenticationService {
     );
   }
 
-  searchUsersByName(username: string): Observable<UserResponse[]> {
-    const token = localStorage.getItem('token');
+  searchUsersByName(username: string | null): Observable<UserResponse[]> {
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.get<UserResponse[]>(`${this.userUrl}search?username=${username}`, { headers });
@@ -93,21 +92,21 @@ export class AuthenticationService {
   }
 
   getUserById(id: number): Observable<UserResponse> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.get<UserResponse>(`${this.userUrl}/${id}`, { headers });
   }
 
   getUserByUsername(username: string): Observable<UserResponse> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
-    return this.http.get<UserResponse>(`${this.userUrl}/username/${username}`, { headers });
+    return this.http.get<UserResponse>(`${this.userUrl}username/${username}`, { headers });
   }
 
   enableTwoFactorAuth(): Observable<string> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.post<{ qrCodeUrl?: string; error?: string }>(
@@ -130,7 +129,7 @@ export class AuthenticationService {
   }
 
   verifyTwoFactorCode(code: number): Observable<TokenResponse> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.post<TokenResponse>(
@@ -139,8 +138,8 @@ export class AuthenticationService {
       { headers }
     ).pipe(
       tap(response => {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('refreshToken', response.refreshToken);
+        sessionStorage.setItem('token', response.token);
+        sessionStorage.setItem('refreshToken', response.refreshToken);
       }),
       catchError(err => {
         console.log("Token: " + token);
@@ -151,7 +150,7 @@ export class AuthenticationService {
   }
 
   updateEmail(email: string): Observable<UserResponse> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.post<UserResponse>(
@@ -168,5 +167,4 @@ export class AuthenticationService {
       })
     );
   }
-
 }

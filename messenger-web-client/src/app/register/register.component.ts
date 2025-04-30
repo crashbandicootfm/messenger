@@ -38,7 +38,7 @@ export class RegisterComponent {
       this.authService.register(regRequest).subscribe({
         next: (response) => {
           console.log('Token:', response.token);
-          localStorage.setItem('token', response.token);
+          sessionStorage.setItem('token', response.token);
           this.router.navigate(['/messenger']);
         },
         error: (err) => {

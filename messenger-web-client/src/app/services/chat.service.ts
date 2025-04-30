@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable, throwError} from 'rxjs';
+import {catchError, map, Observable, of, throwError} from 'rxjs';
 import {ChatRequest} from '../models/request/chat-request.model';
 import {ChatResponse} from '../models/response/chat-response.model';
 import {ChatWithPasswordRequest} from '../models/request/chat-with-password-request.model';
-import {switchMap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +16,7 @@ export class ChatService {
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-    console.log("Token from service:", token);
+    // console.log("Token from service:", token);
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -33,7 +32,7 @@ export class ChatService {
 
   joinChat(name: string): Observable<ChatResponse> {
     const token = localStorage.getItem('token');
-    console.log("Token from service:", token);
+    // console.log("Token from service:", token);
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -91,5 +90,36 @@ export class ChatService {
 
   markChatAsRead(chatId: number, userId: number | null): Observable<void> {
     return this.http.post<void>(`${this.url}${chatId}/mark-as-read`, { userId });
+  }
+
+  getTwoUserChats(): Observable<ChatResponse[]> {
+    const headers = this.getHeaders();
+    return this.http.get<ChatResponse[]>(`${this.url}two-user-chats`, { headers });
+  }
+
+  getParticipantIdsByChatName(chatName: string): Observable<number[]> {
+    const headers = this.getHeaders();
+    return this.http.get<number[]>(`${this.url}participants/ids?name=${encodeURIComponent(chatName)}`, { headers });
+  }
+
+  getChatPublicKeys(chatId: number): Observable<string[]> {
+    return this.http.get<string[]>(`/api/chat/${chatId}/keys`);
+  }
+
+  getParticipantCountByChatName(chatName: string): Observable<number> {
+    const headers = this.getHeaders();
+    return this.http.get<number>(
+      `${this.url}participants/count?name=${chatName}`,
+      { headers }
+    ).pipe(
+      catchError(error => {
+        console.error('Ошибка при получении количества участников:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getChatParticipants(chatId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}${chatId}/participants`);
   }
 }

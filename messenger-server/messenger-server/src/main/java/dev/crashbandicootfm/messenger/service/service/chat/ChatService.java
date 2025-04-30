@@ -4,6 +4,7 @@ import dev.crashbandicootfm.messenger.service.exception.user.ChatException;
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.ChatModel;
 import dev.crashbandicootfm.messenger.service.model.MessageModel;
+import dev.crashbandicootfm.messenger.service.model.UserModel;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,5 +38,13 @@ public interface ChatService {
 
   Long getUnreadMessagesCount(Long chatId, Long userId);
 
+  @NotNull List<ChatModel> findTwoUserChats(@NotNull Long userId) throws UserException;
+
   @NotNull List<ChatModel> getAllChatsByUserId(Long userId);
+
+  List<Long> getChatParticipantIds(Long chatId);
+
+  List<UserModel> getChatParticipants(Long chatId);
+
+  int getParticipantCountByChatName(@NotNull String chatName) throws ChatException;
 }

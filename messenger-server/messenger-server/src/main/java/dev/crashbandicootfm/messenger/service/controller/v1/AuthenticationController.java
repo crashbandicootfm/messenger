@@ -59,13 +59,13 @@ public class AuthenticationController {
     public TokenResponse authenticate(@NotNull @RequestBody AuthenticationRequest authenticationRequest) {
         TokenResponse response = authenticationService.authenticate(authenticationRequest);
         String token = tokenFactory.generateToken(authenticationRequest.getUsername());
+        String refreshToken = tokenFactory.generateRefreshToken(authenticationRequest.getUsername());
 
 
         if (response.isTwoFactorRequired()) {
-            return new TokenResponse(token, "", true);
+            return new TokenResponse(token, refreshToken, true);
         }
 
-        String refreshToken = tokenFactory.generateRefreshToken(authenticationRequest.getUsername());
         return new TokenResponse(token, refreshToken, false);
     }
 

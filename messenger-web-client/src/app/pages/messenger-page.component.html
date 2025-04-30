@@ -121,8 +121,27 @@
   <div class="container">
     <aside class="sidebar" [class.dark]="darkMode">
       <h3>Chats</h3>
-      <ul class="chat-list" #chatList [class.dark]="darkMode">
+      <div class="tabs" [class.dark]="darkMode">
+        <button [class.active]="activeTab === 'groups'" (click)="setActiveTab('groups')">Groups</button>
+        <button [class.active]="activeTab === 'people'" (click)="setActiveTab('people')">People</button>
+      </div>
+      <ul class="chat-list" #chatList [class.dark]="darkMode" *ngIf="activeTab === 'groups'">
         <li *ngFor="let chat of userChats"
+            (click)="openChat(chat)"
+            (contextmenu)="onRightClick($event, chat)"
+            [ngClass]="{'highlight-new-message': chat.unreadCount > 0}">
+          <div class="chat-item" [class.dark]="darkMode">
+            <span class="chat-name" [class.dark]="darkMode">{{ chat.name || "No chat name" }}</span>
+            <span class="chat-last-message" [class.dark]="darkMode">
+          <span class="message-sender">{{ chat.lastMessageSender }}:</span>
+          <span class="message-text">{{ chat.lastMessage || "No messages yet" }}</span>
+        </span>
+          </div>
+        </li>
+      </ul>
+
+      <ul class="chat-list" [class.dark]="darkMode" *ngIf="activeTab === 'people'">
+        <li *ngFor="let chat of twoUserChats"
             (click)="openChat(chat)"
             (contextmenu)="onRightClick($event, chat)"
             [ngClass]="{'highlight-new-message': chat.unreadCount > 0}">

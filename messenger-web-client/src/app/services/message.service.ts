@@ -13,14 +13,14 @@ export class MessageService {
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
   }
 
   sendMessage(messageRequest: MessageRequest): Observable<MessageResponse> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     console.log("Token from service:", token);
 
     const headers = new HttpHeaders({
@@ -32,7 +32,7 @@ export class MessageService {
   }
 
   getMessagesByChatId(chatId: number): Observable<MessageResponse[]> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ export class MessageService {
   }
 
   deleteMessage(messageId: number): Observable<void> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export class MessageService {
   }
 
   markMessageAsRead(messageId: number): Observable<void> {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',

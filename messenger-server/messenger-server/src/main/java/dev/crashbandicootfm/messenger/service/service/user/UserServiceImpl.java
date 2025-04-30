@@ -9,7 +9,6 @@ import dev.crashbandicootfm.messenger.service.model.UserModel;
 import dev.crashbandicootfm.messenger.service.repository.UserRepository;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,8 +142,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void savePublicKey(@NotNull String username, @NotNull String publicKey) throws UserException {
-    publicKeyStore.put(username, publicKey);
+  public UserModel savePublicKey(@NotNull String username, @NotNull String publicKey) throws UserException {
+    UserModel user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new UserException("User not found!"));
+
+    user.setPublicKey(publicKey);
+    return userRepository.save(user);
   }
 
   @Override

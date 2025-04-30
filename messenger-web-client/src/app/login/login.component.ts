@@ -74,8 +74,8 @@ export class LoginComponent {
   }
 
   storeTokensAndRedirect(response: TokenResponse) {
-    localStorage.setItem('token', response.token);
-    localStorage.setItem('refreshToken', response.refreshToken);
+    sessionStorage.setItem('token', response.token);
+    sessionStorage.setItem('refreshToken', response.refreshToken);
     this.router.navigate(['/messenger']);
   }
 

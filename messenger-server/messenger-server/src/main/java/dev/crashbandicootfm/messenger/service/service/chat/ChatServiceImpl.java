@@ -12,9 +12,9 @@ import dev.crashbandicootfm.messenger.service.repository.MessageRepository;
 import dev.crashbandicootfm.messenger.service.repository.UserRepository;
 import dev.crashbandicootfm.messenger.service.service.user.UserService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -73,11 +73,9 @@ public class ChatServiceImpl implements ChatService {
 
     ChatModel savedChat = chatRepository.save(chat);
     savedChat.getUserIds().add(userId);
-    log.info("Created chat: {}", savedChat);
 
     user.getChatIds().add(savedChat.getId());
     userRepository.save(user);
-    log.info("Created user: {}", user);
 
     return savedChat;
   }
@@ -93,8 +91,6 @@ public class ChatServiceImpl implements ChatService {
         .orElseThrow(() -> new ChatException("Chat not found!"));
 
     UserModel user = userService.getById(userId);
-    System.out.println("AAAAAAAAAAAAAAAAAA");
-    System.out.println("User: " + user.getId());
     if (user == null) {
       throw new UserException("User not found!");
     }
@@ -103,13 +99,11 @@ public class ChatServiceImpl implements ChatService {
       throw new ChatException("User is already in the chat!");
     }
 
-    System.out.println("AAAAAAAAAA");
 
     try {
       chat.getUserIds().add(userId);
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("Failed");
     }
     try {
       user.getChatIds().add(chat.getId());
@@ -117,10 +111,8 @@ public class ChatServiceImpl implements ChatService {
 
     chatRepository.save(chat);
     userRepository.save(user);
-    System.out.println("Saved: " + user.getId());
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("Failed 1");
     }
     return chat;
   }
@@ -174,21 +166,11 @@ public class ChatServiceImpl implements ChatService {
 
     List<ChatModel> chats = chatRepository.findAllByIdIn(user.getChatIds());
 
-    for (ChatModel chat : chats) {
-      if ("private_chat".equals(chat.getName())) {
-        Long otherUserId = chat.getUserIds().stream()
-            .filter(id -> !id.equals(userId))
-            .findFirst()
-            .orElse(null);
+    List<ChatModel> filteredChats = chats.stream()
+        .filter(chat -> !"private_chat".equals(chat.getName()))
+        .toList();
 
-        if (otherUserId != null) {
-          UserModel otherUser = userService.getById(otherUserId);
-          chat.setName(otherUser != null ? otherUser.getUsername() : "A");
-        }
-      }
-    }
-
-    return chats;
+    return filteredChats;
   }
 
   @Override
@@ -280,5 +262,88 @@ public class ChatServiceImpl implements ChatService {
   @Override
   public @NotNull List<ChatModel> getAllChatsByUserId(Long userId) {
     return chatRepository.findUserChats(userId);
+  }
+
+  @Override
+  public @NotNull List<ChatModel> findTwoUserChats(@NotNull Long userId) throws UserException {
+    UserModel user = userService.getById(userId);
+    if (user == null) {
+      throw new UserException("User not found!");
+    }
+
+    List<ChatModel> userChats = chatRepository.findAllByIdIn(user.getChatIds());
+
+    List<ChatModel> twoUserChats = new ArrayList<>();
+    for (ChatModel chat : userChats) {
+      if (chat.getUserIds().size() == 2) {
+        twoUserChats.add(chat);
+      }
+    }
+
+    for (ChatModel chat : twoUserChats) {
+      if ("private_chat".equals(chat.getName())) {
+        Long otherUserId = chat.getUserIds().stream()
+            .filter(id -> !id.equals(userId))
+            .findFirst()
+            .orElse(null);
+
+        if (otherUserId != null) {
+          UserModel otherUser = userService.getById(otherUserId);
+          chat.setName(otherUser != null ? otherUser.getUsername() : "A");
+        }
+      }
+    }
+
+    return twoUserChats;
+  }
+
+  @Override
+  public List<Long> getChatParticipantIds(Long chatId) throws ChatException {
+    ChatModel chat = getById(chatId);
+    return new ArrayList<>(chat.getUserIds());
+  }
+
+  @Override
+  public List<UserModel> getChatParticipants(Long chatId) throws ChatException {
+    List<Long> participantIds = getChatParticipantIds(chatId);
+    return (List<UserModel>) userRepository.findAllById(participantIds);
+  }
+
+  @Override
+  public int getParticipantCountByChatName(@NotNull String chatName) throws ChatException {
+    Optional<ChatModel> optionalChat = chatRepository.findByName(chatName);
+
+    if (optionalChat.isPresent()) {
+      return optionalChat.get().getUserIds().size();
+    }
+
+    // If not found, check if it might be a private chat with a display name
+    // Find all private chats where the user is a participant
+    List<ChatModel> privateChats = chatRepository.findAllByName("private_chat");
+
+    for (ChatModel chat : privateChats) {
+      // For private chats, we need to check if the display name matches
+      if (chat.getUserIds().size() == 2) {
+        try {
+          // Get the other participant's username
+          Long otherUserId = chat.getUserIds().stream()
+              .filter(id -> !id.equals(chat.getCreatedBy()))
+              .findFirst()
+              .orElse(null);
+
+          if (otherUserId != null) {
+            UserModel otherUser = userService.getById(otherUserId);
+            if (otherUser != null && chatName.equals(otherUser.getUsername())) {
+              return 2;
+            }
+          }
+        } catch (UserException e) {
+          log.warn("Error getting user info for private chat participant", e);
+          continue;
+        }
+      }
+    }
+
+    throw new ChatException("Chat not found!");
   }
 }

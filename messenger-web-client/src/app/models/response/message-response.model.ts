@@ -1,5 +1,8 @@
 export interface MessageResponse {
+  encrypted?: boolean;
+  isEncrypted?: boolean;
   id: number;
+  recipientId: number;
   message: string;
   sentAt: string;
   sentDate: string;

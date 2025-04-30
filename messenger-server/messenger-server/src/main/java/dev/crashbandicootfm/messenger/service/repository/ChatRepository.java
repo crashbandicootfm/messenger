@@ -19,4 +19,6 @@ public interface ChatRepository extends CrudRepository<ChatModel, Long> {
   @Query("SELECT c FROM ChatModel c WHERE c.id IN (" +
       "SELECT cu.chatId FROM ChatUserStatusModel cu WHERE cu.userId = :userId)")
   List<ChatModel> findUserChats(@Param("userId") Long userId);
+
+  List<ChatModel> findAllByName(String name);
 }

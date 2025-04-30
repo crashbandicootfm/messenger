@@ -1,14 +1,19 @@
 package dev.crashbandicootfm.messenger.service.controller.v1;
 
+import dev.crashbandicootfm.messenger.service.api.request.KeyRequest;
+import dev.crashbandicootfm.messenger.service.exception.user.UserException;
+import dev.crashbandicootfm.messenger.service.model.UserModel;
+import dev.crashbandicootfm.messenger.service.repository.UserRepository;
 import dev.crashbandicootfm.messenger.service.service.key.KeyService;
+import dev.crashbandicootfm.messenger.service.service.user.UserService;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/keys")
@@ -18,8 +23,12 @@ public class KeyController {
 
     @NotNull KeyService keyService;
 
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<String> getClientPublicKey(@PathVariable Long clientId) {
+    @NotNull UserService userService;
+
+    @NotNull UserRepository userRepository;
+
+    @GetMapping("/get-client-key/{clientId}")
+    public ResponseEntity<String> getClientKey(@PathVariable Long clientId) {
         String publicKey = keyService.getClientPublicKey(clientId);
         if (publicKey == null) {
             return ResponseEntity.notFound().build();
@@ -28,15 +37,25 @@ public class KeyController {
     }
 
     @PostMapping("/store-client-key")
-    public ResponseEntity<String> storeClientPublicKey(@RequestBody Map<Long, String> request) {
-        Long clientId = Long.valueOf(request.get("clientId"));
-        String publicKey = request.get("publicKey");
-
-        if (clientId == null || publicKey == null) {
-            return ResponseEntity.badRequest().body("Invalid request");
+    public ResponseEntity<Void> storeClientKey(@RequestBody KeyRequest request) {
+        if (request.getClientId() == null || request.getPublicKey() == null) {
+            return ResponseEntity.badRequest().build();
         }
 
-        keyService.storeClientPublicKey(clientId, publicKey);
-        return ResponseEntity.ok("Client public key stored successfully");
+        try {
+            String username = getUsernameByClientId(request.getClientId());
+
+            userService.savePublicKey(username, request.getPublicKey());
+
+            return ResponseEntity.ok().build();
+        } catch (UserException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    private String getUsernameByClientId(Long clientId) throws UserException {
+        return userRepository.findById(clientId)
+            .map(UserModel::getUsername)
+            .orElseThrow(() -> new UserException("User not found!"));
     }
 }

@@ -5,6 +5,9 @@ export interface Message {
   text: string;
   fileId?: number;
   fileUrl?: string;
+  encryptedText?: string | null;
+  recipientId?: number;
+  isEncrypted?: boolean;
   avatarUrl?: string;
   isEphemeral?: boolean;
   timerId?: any;

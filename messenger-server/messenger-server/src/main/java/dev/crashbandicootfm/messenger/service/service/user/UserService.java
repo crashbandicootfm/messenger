@@ -33,7 +33,7 @@ public interface UserService {
 
   @NotNull List<UserModel> searchUserByUserName(@NotNull String username);
 
-  void savePublicKey(@NotNull String username, @NotNull String publicKey) throws UserException;
+  UserModel savePublicKey(@NotNull String username, @NotNull String publicKey) throws UserException;
 
   @NotNull String getPublicKey(@NotNull String username);
 

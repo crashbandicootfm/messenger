@@ -1,5 +1,6 @@
 package dev.crashbandicootfm.messenger.service.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.List;
 import lombok.*;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Date;
 
 @Slf4j
+@ToString
 @Entity
 @Getter
 @Setter
@@ -44,9 +46,20 @@ public class MessageModel {
   @Column(name = "file_url")
   String fileUrl;
 
+  @Column(name = "is_encrypted")
+  @Builder.Default
+  boolean isEncrypted = true;
+
+
+  int recipientId = 0;
+
   public void markAsRead(Long userId) {
     if (!readByUsers.contains(userId)) {
       readByUsers.add(userId);
     }
+  }
+
+  public boolean isEncrypted() {
+    return isEncrypted;
   }
 }

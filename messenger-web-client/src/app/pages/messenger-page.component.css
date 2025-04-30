@@ -580,11 +580,12 @@ body.dark {
   margin: 0;
   max-height: 700px;
   overflow-y: auto;
-  scrollbar-width: thin; /* Тонкий скроллбар для Firefox */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .chat-list::-webkit-scrollbar {
-  width: 8px;
+  display: none;
 }
 
 .chat-list::-webkit-scrollbar-thumb {
@@ -810,6 +811,7 @@ body.dark {
 
 .context-menu button:hover {
   background: #f5f5f5;
+  color: red;
 }
 
 :not(.dark) .highlight-new-message .chat-item {
@@ -1373,4 +1375,72 @@ h2 {
 
 .chat-modal-button:active {
   transform: scale(0.98);
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tabs button {
+  flex: 1;
+  padding: 12px 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+.tabs button::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 0;
+  height: 3px;
+  background-color: #28a745;
+  transition: width 0.3s ease-in-out, left 0.3s ease-in-out;
+}
+
+.tabs button:hover {
+  color: #28a745;
+}
+
+.tabs button.active {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.tabs button.active::after {
+  width: 100%;
+  left: 0;
+}
+
+.tabs.dark {
+  background: #1f2937;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.tabs.dark button {
+  color: #bbb;
+}
+
+.tabs.dark button:hover {
+  color: #28a745;
+}
+
+.tabs.dark button.active {
+  color: #28a745;
+}
+
+.tabs.dark button.active::after {
+  background-color: #28a745;
 }

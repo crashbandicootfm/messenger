@@ -16,4 +16,8 @@ public class CreateMessageCommand {
   @NotNull Long chatId;
 
   @NotNull Long userId;
+
+  boolean isEncrypted;
+
+  int recipientId;
 }

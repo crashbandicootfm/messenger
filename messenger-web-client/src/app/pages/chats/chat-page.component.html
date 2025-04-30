@@ -9,7 +9,6 @@
 </head>
 <body [class.dark]="darkMode">
 <div class="chat-container" [class.dark]="darkMode">
-  <!-- Боковая панель -->
   <aside class="chat-sidebar" [class.dark]="darkMode">
     <div class="profile-section" [class.dark]="darkMode">
       <div class="profile-avatar" [class.dark]="darkMode" (click)="toggleProfileMenu()">
@@ -37,7 +36,6 @@
       </button>
     </div>
 
-    <!-- Модальное окно подтверждения -->
     <div class="modal-overlay" *ngIf="showConfirmation">
       <div class="modal">
         <p>Are you sure you want to leave this chat?</p>
@@ -49,7 +47,6 @@
     </div>
   </aside>
 
-  <!-- Основная часть чата -->
   <div class="chat-content" [class.dark]="darkMode">
     <header class="chat-header" [class.dark]="darkMode">
       <h1 class="chat-title">{{ chatName }}</h1>
@@ -75,25 +72,36 @@
       {{ chat.name }}
     </div>
 
-    <!-- Сообщения чата -->
     <div class="chat-messages" [class.dark]="darkMode">
       <ng-container *ngFor="let message of filteredMessages; let i = index">
-        <!-- Разделитель даты -->
         <div *ngIf="i === 0 || message.sentDate !== filteredMessages[i - 1].sentDate" class="date-separator" [class.dark]="darkMode">
           {{ message.sentDate }}
         </div>
 
-        <!-- Контейнер сообщения -->
-        <div class="message-container" [class.own-message]="message.id === currentUserId">
-          <!-- Имя пользователя над сообщением -->
+        <div
+          class="message-container"
+          [class.own-message]="message.id === currentUserId"
+          (contextmenu)="onMessageRightClick($event, message)"
+        >
           <div class="user-info">
             <span *ngIf="message.user" class="username">{{ message.user }}</span>
           </div>
 
-          <!-- Сообщение -->
           <div class="message">
             <span class="text">{{ message.text }}</span>
             <span class="timestamp">{{ message.sentAt }}</span>
+          </div>
+
+          <div
+            class="context-menu"
+            *ngIf="contextMessageMenuVisible"
+            [style.left.px]="contextMessageX"
+            [style.top.px]="contextMessageY"
+            (click)="contextMessageMenuVisible = false"
+          >
+            <ul>
+              <li (click)="deleteSelectedMessage()">Delete message</li>
+            </ul>
           </div>
 
           <div class="user-info">
@@ -103,7 +111,6 @@
       </ng-container>
     </div>
 
-    <!-- Футер с вводом сообщения -->
     <footer class="chat-footer" [class.dark]="darkMode">
       <div class="chat-input-container">
 
@@ -116,12 +123,13 @@
           [(ngModel)]="newMessage"
           type="text"
           placeholder="Write a message..."
-          class="chat-input" [class.dark]="darkMode"
+          class="chat-input"
+          [class.dark]="darkMode"
+          (keydown)="handleKeyDown($event)"
         />
 
-        <!-- Кнопка отправки исчезающего сообщения -->
         <button
-          (click)="sendMessage()"
+          (click)="dispatchSendMessage()"
           (contextmenu)="openEphemeralMenu($event)"
           class="send-button"
         >
@@ -132,13 +140,11 @@
           />
         </button>
 
-        <!-- Кнопка отправки сообщения с задержкой -->
         <button (click)="toggleSendLaterMenu()" class="send-later-button">
           <i class="fas fa-calendar-days"></i>
         </button>
       </div>
 
-      <!-- Меню таймера для исчезающего сообщения -->
       <div
         *ngIf="isEphemeralMenuOpen"
         class="send-later-menu"
@@ -160,7 +166,6 @@
         </div>
       </div>
 
-      <!-- Меню для отправки с задержкой -->
       <div
         *ngIf="isSendLaterMenuOpen"
         class="send-later-menu"

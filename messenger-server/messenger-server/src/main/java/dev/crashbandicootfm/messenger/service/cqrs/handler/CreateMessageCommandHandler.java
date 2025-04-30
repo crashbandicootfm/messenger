@@ -36,6 +36,8 @@ public class CreateMessageCommandHandler implements CommandHandler<CreateMessage
         .sentAt(new Date())
         .chatId(command.getChatId())
         .message(command.getMessage())
+        .isEncrypted(command.isEncrypted())
+        .recipientId(command.getRecipientId())
         .build();
     return messageService.save(model);
   }

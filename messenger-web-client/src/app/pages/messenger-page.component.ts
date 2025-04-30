@@ -17,6 +17,7 @@ import {ChatResponse} from '../models/response/chat-response.model';
 import {animate, style, transition, trigger} from '@angular/animations';
 import {UserResponse} from '../models/response/user-response.model';
 import {MessageService} from '../services/message.service';
+import {EncryptionService} from '../services/encryption.service';
 
 @Component({
   selector: 'app-messenger-page',
@@ -73,12 +74,15 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
   newChatName = '';
   modalStep: number = 1;
   newPassword: string = '';
+  activeTab: 'groups' | 'people' = 'groups';
+  twoUserChats: ChatResponse[] = [];
 
   constructor(
     private router: Router,
     private chatService: ChatService,
     private messageService: MessageService,
     private authService: AuthenticationService,
+    private encryptionService: EncryptionService,
     private route: ActivatedRoute,
     private http: HttpClient
   ) {}
@@ -86,9 +90,10 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.loadUserProfile();
     this.loadUserChats();
+    this.loadTwoUserChats();
     this.chatId = +this.route.snapshot.paramMap.get('chatId')!;
 
-    const savedTheme = localStorage.getItem('darkMode');
+    const savedTheme = sessionStorage.getItem('darkMode');
     this.darkMode = savedTheme ? JSON.parse(savedTheme) : false;
     document.body.classList.toggle('dark', this.darkMode);
 
@@ -108,6 +113,7 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => this.scrollToBottom(), 100);
   }
+
 
   scrollToBottom(): void {
     if (this.chatList) {
@@ -158,7 +164,6 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
         this.userChats = chats;
         this.updateUnreadCounts();
 
-        // Принудительное обновление Angular Change Detection
         setTimeout(() => {
           this.userChats = [...this.userChats];
         });
@@ -169,18 +174,37 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
     });
   }
 
+  loadTwoUserChats(): void {
+    this.chatService.getTwoUserChats().subscribe({
+      next: (chats) => {
+        this.twoUserChats = chats;
+        this.updateUnreadCounts();
+      },
+      error: (err) => console.error('Ошибка загрузки 1-on-1 чатов:', err)
+    });
+  }
+
+  setActiveTab(tab: 'groups' | 'people'): void {
+    this.activeTab = tab;
+  }
+
   updateUnreadCounts(): void {
     this.userChats.forEach(chat => {
       if (this.userId) {
-        this.chatService.getUnreadMessagesCount(chat.id, this.userId).subscribe({
-          next: (unreadCount) => {
-            console.log(`Chat ID ${chat.name} unread count:`, unreadCount);
-            chat.unreadCount = unreadCount;
-          },
-          error: (err) => {
-            console.error('Ошибка получения непрочитанных сообщений:', err);
-          }
-        });
+        if (chat.lastMessageSender !== this.userId.toString()) {
+          this.chatService.getUnreadMessagesCount(chat.id, this.userId).subscribe({
+            next: (unreadCount) => {
+              console.log(`Chat ID ${chat.name} unread count:`, unreadCount);
+
+              chat.unreadCount = unreadCount;
+            },
+            error: (err) => {
+              console.error('Ошибка получения непрочитанных сообщений:', err);
+            }
+          });
+        } else {
+          chat.unreadCount = 0;
+        }
       }
     });
   }
@@ -312,7 +336,6 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
             return;
           }
 
-          // Добавляем чат вручную в список
           this.userChats = [...this.userChats, newChat];
 
           this.router.navigate([`/chats/${newChat.id}/${newChat.name}`], {
@@ -543,7 +566,7 @@ export class MessengerPageComponent implements OnInit, AfterViewInit {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
       this.http.post(`http://localhost:8080/api/v1/users/upload-avatar/${this.userId}`, formData, { headers })

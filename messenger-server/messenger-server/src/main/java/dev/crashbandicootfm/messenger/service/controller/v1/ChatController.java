@@ -12,12 +12,18 @@ import dev.crashbandicootfm.messenger.service.exception.user.ChatException;
 import dev.crashbandicootfm.messenger.service.exception.user.UserException;
 import dev.crashbandicootfm.messenger.service.model.ChatModel;
 import dev.crashbandicootfm.messenger.service.model.MessageModel;
+import dev.crashbandicootfm.messenger.service.model.UserModel;
+import dev.crashbandicootfm.messenger.service.repository.ChatRepository;
 import dev.crashbandicootfm.messenger.service.repository.MessageRepository;
 import dev.crashbandicootfm.messenger.service.service.chat.ChatService;
+import dev.crashbandicootfm.messenger.service.service.key.KeyService;
 import dev.crashbandicootfm.messenger.service.service.message.MessageService;
 import dev.crashbandicootfm.messenger.service.service.security.details.UserDetailsImpl;
+import dev.crashbandicootfm.messenger.service.service.user.UserService;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -53,7 +59,13 @@ public class ChatController {
 
   @NotNull MessageService messageService;
 
+  @NotNull KeyService keyService;
+
   @NotNull MessageRepository messageRepository;
+
+  @NotNull UserService userService;
+
+  @NotNull ChatRepository chatRepository;
 
   @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
   public ChatResponse create(
@@ -235,5 +247,102 @@ public class ChatController {
     Long userId = request.get("userId");
     chatService.markChatAsRead(chatId, userId, messageRepository.getLastMessageId(chatId));
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/two-user-chats")
+  public ResponseEntity<List<ChatResponse>> findTwoUserChats(@AuthenticationPrincipal UserDetailsImpl principal) {
+    try {
+      List<ChatModel> chats = chatService.findTwoUserChats(principal.getId());
+
+      List<ChatResponse> responses = chats.stream()
+          .map(chat -> {
+            String lastMessage = messageService.findLastMessageByChatId(chat.getId());
+            String lastMessageSender = messageService.findLastMessageSenderByChatId(chat.getId());
+            Long unreadCount = chatService.getUnreadMessagesCount(chat.getId(), principal.getId());
+
+            return new ChatResponse(
+                chat.getId(),
+                chat.getName(),
+                chat.getCreatedAt(),
+                lastMessage,
+                lastMessageSender,
+                unreadCount
+            );
+          })
+          .toList();
+
+      return ResponseEntity.ok(responses);
+    } catch (UserException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.emptyList());
+    }
+  }
+
+  @GetMapping("/{chatId}/keys")
+  public ResponseEntity<List<String>> getChatKeys(
+      @PathVariable Long chatId,
+      @AuthenticationPrincipal UserDetailsImpl principal) {
+
+    if (!chatService.getById(chatId).getUserIds().contains(principal.getId())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    return ResponseEntity.ok(keyService.getChatParticipantsKeys(chatId));
+  }
+
+  @GetMapping("/participants/ids")
+  public ResponseEntity<List<Long>> getParticipantIdsByChatName(@RequestParam String name) {
+    try {
+      ChatModel chat = chatService.findByChatName(name);
+      List<Long> participantIds = chatService.getChatParticipantIds(chat.getId());
+      return ResponseEntity.ok(participantIds);
+    } catch (ChatException e) {
+      log.error("Error getting participant IDs: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.emptyList());
+    } catch (Exception e) {
+      log.error("Unexpected error: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+    }
+  }
+
+  @GetMapping("/participants/count")
+  public ResponseEntity<?> getParticipantCountByChatName(
+      @RequestParam String name,
+      @AuthenticationPrincipal UserDetailsImpl principal
+  ) {
+    try {
+      // Проверка аутентификации
+      if (principal == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
+
+      Optional<ChatModel> chatOpt = chatRepository.findByName(name);
+
+      if (chatOpt.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      }
+
+      ChatModel chat = chatOpt.get();
+
+      // Проверка участия в чате
+      if (!chat.getUserIds().contains(principal.getId())) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      }
+
+      return ResponseEntity.ok(chat.getUserIds().size());
+
+    } catch (Exception e) {
+      log.error("Error getting participant count: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @GetMapping("/{chatId}/participants")
+  public ResponseEntity<List<UserModel>> getChatParticipants(@PathVariable Long chatId) {
+    try {
+      List<UserModel> participants = chatService.getChatParticipants(chatId);
+      return ResponseEntity.ok(participants);
+    } catch (ChatException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 }

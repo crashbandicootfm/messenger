@@ -12,12 +12,14 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -34,8 +36,6 @@ public class MessageServiceImpl implements MessageService {
 
   @Override
   public @NotNull MessageModel save(@NotNull MessageModel messageModel) {
-    String encryptedMessage = messageModel.getMessage();
-    messageModel.setMessage(encryptedMessage);
     return messageRepository.save(messageModel);
   }
 

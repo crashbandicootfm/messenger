@@ -17,5 +17,4 @@ public class CreateFileMessageCommand {
   @NotNull String fileUrl;
   @NotNull Date sentAt;
   boolean isImage; // Новое поле
-
 }

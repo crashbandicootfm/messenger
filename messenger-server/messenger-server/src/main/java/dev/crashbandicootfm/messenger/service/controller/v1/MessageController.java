@@ -27,6 +27,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,16 +56,21 @@ public class MessageController {
 
     @PostMapping("/")
     public MessageResponse create(
-            @NotNull @RequestBody MessageRequest request,
-            @AuthenticationPrincipal UserDetailsImpl principal
+        @NotNull @RequestBody MessageRequest request,
+        @AuthenticationPrincipal UserDetailsImpl principal
     ) {
         CreateMessageCommand command = new CreateMessageCommand(
-                request.getMessage(),
-                request.getChatId(),
-                principal.getId()
+            request.getMessage(),
+            request.getChatId(),
+            principal.getId(),
+            request.isEncrypted(),
+            request.getRecipientId()
         );
         MessageModel model = mediatr.dispatch(command, MessageModel.class);
-        return mapper.map(model, MessageResponse.class);
+        log.info("message created: {}", model);
+        MessageResponse response = mapper.map(model, MessageResponse.class);
+        response.setEncrypted(model.isEncrypted());
+        return response;
     }
 
     @GetMapping("/chat/{chatId}")
@@ -74,7 +80,7 @@ public class MessageController {
         return messages.stream()
             .map(message -> {
                 UserModel user = messageService.getUserById(message.getCreatedBy());
-                return new MessageResponse(
+                MessageResponse response = new MessageResponse(
                     message.getId(),
                     message.getMessage(),
                     message.getSentAt(),
@@ -82,12 +88,14 @@ public class MessageController {
                     message.getChatId(),
                     user.getUsername()
                 );
+                response.setEncrypted(message.isEncrypted());
+                response.setFileUrl(message.getFileUrl());
+                return response;
             }).collect(Collectors.toList());
     }
 
     @DeleteMapping("/mess/{messageId}")
     public void deleteChatMessages(@PathVariable Long messageId) {
-        System.out.println("AAAAAAAAAAAA");
         messageService.deleteMessageById(messageId);
         System.out.println("Deleted message: " + messageId);
     }
